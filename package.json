@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check": "eslint . && prettier --check . && tsc --noEmit && next build"
+    "check": "eslint . && prettier --check . && next typegen && tsc --noEmit && next build"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
