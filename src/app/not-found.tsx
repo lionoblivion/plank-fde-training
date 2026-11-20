@@ -4,19 +4,24 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-6 px-6 py-16">
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-muted-foreground">404</p>
-        <h1 className="text-3xl font-semibold tracking-tight">
+    <main className="relative mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 overflow-hidden px-6 py-16">
+      <p
+        aria-hidden
+        className="pointer-events-none select-none font-heading text-[clamp(7rem,28vw,14rem)] leading-none font-semibold tracking-tighter text-foreground/8 animate-in fade-in zoom-in-95 duration-700"
+      >
+        404
+      </p>
+      <div className="-mt-[min(28vw,9rem)] flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-150 fill-mode-both">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Page not found
         </h1>
-        <p className="text-muted-foreground">
+        <p className="max-w-md text-muted-foreground">
           This page does not exist or may have moved. Return home to continue
           with WorkBot.
         </p>
-      </div>
-      <div>
-        <Button render={<Link href="/" />}>Back to home</Button>
+        <div>
+          <Button render={<Link href="/" />}>Back to home</Button>
+        </div>
       </div>
     </main>
   );
