@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -7,6 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { config } from "@/lib/config";
+
+export const metadata: Metadata = {
+  title: "Settings",
+  description:
+    "Deployment environment and commit details for this WorkBot instance.",
+};
 
 export default function SettingsPage() {
   return (
