@@ -1,30 +1,36 @@
-# plank-fde-training
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Your project for Plank's [AI FDE Course](https://joinplank.com/ai-fde-course).
+## Getting Started
 
-One repository for the whole course. Day 1 scaffolds it, and every day after
-adds to it: WorkBot, an enterprise workflow platform, grows here week by week.
-There are no per-day folders. The project is the deliverable.
+First, run the development server:
 
-## How verification works
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-When you finish a day, open the day's page in the course and press
-**Verify Day N**. Plank reads this public repository (it never writes to it)
-and checks whether the commits since your last verified day are broadly that
-day's work. What the day ships is the yardstick, and partial progress counts.
-Days verify in order.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Keep commits small and messages honest. They are what the check reads.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Structure
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Yours to decide. From Week 6 the course moves WorkBot into a config-first
-monorepo, so a layout with room for several apps and shared packages saves a
-move later.
+## Learn More
 
-## Your profile
+To learn more about Next.js, take a look at the following resources:
 
-Every verified day appears on your public profile at
-`joinplank.com/fde/<your-github-login>`, with what you shipped and the skills
-it added. The repository description links to it; add the same link as the
-repository's website so it shows under the name.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
