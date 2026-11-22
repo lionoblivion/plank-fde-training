@@ -38,13 +38,15 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
 - `/component` — создаёт React-компонент в `src/components/` и соседний Vitest-тест по паттернам проекта.
 - `/api-route` — создаёт API-маршрут в `src/app/api/` со схемами Zod, обработчиками и тестами.
 - `/pre-deploy` — прогоняет typecheck, тесты, поиск `console.log` и сверку env перед выкладкой.
-- `/pr-review` — параллельно запускает трёх ревьюеров по diff PR или ветки и собирает общий вердикт.
+- `/pr-review` — ревью по Review Policy (число агентов от Risk Assessment LOW/MEDIUM/HIGH); в файле цикла указать вызванных Agents.
 
 ### Subagents
 
-- **Bug Hunter** — ищет ошибки логики, null/undefined, Promise и race conditions.
-- **Performance Reviewer** — ищет проблемы производительности, лишние await, bundle и ненужный `"use client"`.
-- **Security Reviewer** — ищет injection, проблемы auth, утечки секретов и небезопасную обработку данных.
+Запуск **условный** (см. Review Policy в `../doc-plank-fde-training/пайплайн.md`):
+
+- **Bug Hunter** — логика, null/undefined, Promise, race (часто единственный на LOW).
+- **Performance Reviewer** — await, bundle, лишний `"use client"` (MEDIUM по необходимости / HIGH всегда).
+- **Security Reviewer** — injection, auth, секреты (MEDIUM по необходимости / HIGH всегда).
 
 ### Hook
 
