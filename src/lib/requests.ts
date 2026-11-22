@@ -73,6 +73,12 @@ export async function listRequests(): Promise<WorkRequest[]> {
   return [...getStore()].reverse();
 }
 
+/** Заявка по id или undefined, если нет. io() — request-time чтение. */
+export async function getRequest(id: string): Promise<WorkRequest | undefined> {
+  await io();
+  return getStore().find((request) => request.id === id);
+}
+
 export type StatusCounts = Record<(typeof statuses)[number], number>;
 
 /** Считает заявки по каждому статусу (включая нули). */

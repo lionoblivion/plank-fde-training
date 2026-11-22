@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import {
   countRequestsByStatus,
   createRequest,
+  getRequest,
   listRequests,
   resetRequestStore,
   type WorkRequest,
@@ -92,6 +93,18 @@ describe("requests", () => {
       expect(listed).toHaveLength(2);
       expect(listed.map((item) => item.title)).toEqual(["Вторая", "Первая"]);
       expect(listed[0]?.status).toBe("open");
+    });
+
+    it("возвращает заявку по id и undefined для неизвестного", async () => {
+      const created = createRequest({
+        title: "Деталь",
+        team: "finance",
+      });
+
+      await expect(getRequest(created.id)).resolves.toEqual(created);
+      await expect(
+        getRequest("00000000-0000-4000-8000-000000000000"),
+      ).resolves.toBeUndefined();
     });
   });
 
