@@ -82,16 +82,21 @@ export async function listPolicies(): Promise<PolicyFrontMatter[]> {
   const policies: PolicyFrontMatter[] = [];
 
   for (const fileName of markdownFiles) {
-    const slugFromName = fileName.replace(/\.md$/i, "");
-    const filePath = resolvePolicyFilePath(slugFromName);
-    const raw = await readFile(filePath, "utf8");
-    const policy = parsePolicyFile(raw, slugFromName);
-    policies.push({
-      title: policy.title,
-      slug: policy.slug,
-      team: policy.team,
-      summary: policy.summary,
-    });
+    try {
+      const slugFromName = fileName.replace(/\.md$/i, "");
+      const filePath = resolvePolicyFilePath(slugFromName);
+      const raw = await readFile(filePath, "utf8");
+      const policy = parsePolicyFile(raw, slugFromName);
+      policies.push({
+        title: policy.title,
+        slug: policy.slug,
+        team: policy.team,
+        summary: policy.summary,
+      });
+    } catch {
+      // Пропускаем битый файл: список не должен отдавать 500 из‑за одного .md
+      continue;
+    }
   }
 
   return policies;
@@ -110,16 +115,9 @@ export async function getPolicy(slug: string): Promise<Policy | null> {
     const filePath = resolvePolicyFilePath(parsedSlug.data);
     const raw = await readFile(filePath, "utf8");
     return parsePolicyFile(raw, parsedSlug.data);
-  } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "ENOENT"
-    ) {
-      return null;
-    }
-    throw error;
+  } catch {
+    // Нет файла или невалидный front matter → 404 на странице, не 500
+    return null;
   }
 }
 
