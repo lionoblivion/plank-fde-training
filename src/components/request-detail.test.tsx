@@ -24,6 +24,9 @@ describe("RequestDetail", () => {
     expect(html).toContain("Высокий");
     expect(html).toContain("Открыта");
     expect(html).toContain("Создана:");
+    expect(html).toContain("Сменить статус");
+    expect(html).toContain("В работе");
+    expect(html).toContain("Готово");
     expect(html).toContain('href="/requests"');
   });
 

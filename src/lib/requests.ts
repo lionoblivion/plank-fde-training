@@ -93,3 +93,26 @@ export function countRequestsByStatus(requests: WorkRequest[]): StatusCounts {
   }
   return counts;
 }
+
+/**
+ * Меняет статус заявки. Статус проверяется по enum схемы до записи.
+ * Бросает ZodError при неизвестном статусе и Error, если id не найден.
+ */
+export function updateRequestStatus(id: string, status: unknown): WorkRequest {
+  const parsedStatus = z.enum(statuses).parse(status);
+  const store = getStore();
+  const index = store.findIndex((request) => request.id === id);
+  if (index === -1) {
+    throw new Error("Заявка не найдена");
+  }
+  const current = store[index];
+  if (!current) {
+    throw new Error("Заявка не найдена");
+  }
+  const updated = workRequestSchema.parse({
+    ...current,
+    status: parsedStatus,
+  });
+  store[index] = updated;
+  return updated;
+}

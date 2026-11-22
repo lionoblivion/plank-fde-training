@@ -7,6 +7,7 @@ import {
   getRequest,
   listRequests,
   resetRequestStore,
+  updateRequestStatus,
   type WorkRequest,
 } from "./requests";
 
@@ -162,6 +163,36 @@ describe("requests", () => {
         in_progress: 1,
         done: 1,
       });
+    });
+  });
+
+  describe("updateRequestStatus", () => {
+    it("меняет статус на допустимый из enum", async () => {
+      const created = createRequest({
+        title: "Смена статуса",
+        team: "operations",
+      });
+
+      const updated = updateRequestStatus(created.id, "in_progress");
+      expect(updated.status).toBe("in_progress");
+      expect(updateRequestStatus(created.id, "done").status).toBe("done");
+      expect((await getRequest(created.id))?.status).toBe("done");
+    });
+
+    it("отклоняет неизвестный статус до записи", async () => {
+      const created = createRequest({
+        title: "Плохой статус",
+        team: "support",
+      });
+
+      expect(() => updateRequestStatus(created.id, "closed")).toThrow(ZodError);
+      expect((await getRequest(created.id))?.status).toBe("open");
+    });
+
+    it("бросает ошибку, если заявки нет", () => {
+      expect(() =>
+        updateRequestStatus(crypto.randomUUID(), "done"),
+      ).toThrowError("Заявка не найдена");
     });
   });
 });

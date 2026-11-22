@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { RequestStatusActions } from "@/components/request-status-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,6 +70,10 @@ export function RequestDetail({ request }: { request: WorkRequest }) {
         ) : (
           <p className="text-sm text-muted-foreground">Описание не указано.</p>
         )}
+      </div>
+      <div className="flex flex-col gap-2">
+        <h2 className="text-sm font-medium">Сменить статус</h2>
+        <RequestStatusActions request={request} />
       </div>
       <div>
         <Button variant="outline" render={<Link href="/requests" />}>
