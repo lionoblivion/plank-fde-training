@@ -24,7 +24,13 @@ export function SiteHeader() {
             Заявки
           </Link>
           <Link
-            href="/settings"
+            href="/admin"
+            className="transition-colors hover:text-foreground"
+          >
+            Админ
+          </Link>
+          <Link
+            href="/admin/settings"
             className="transition-colors hover:text-foreground"
           >
             Настройки
