@@ -27,6 +27,7 @@ describe("RequestsTable", () => {
     const html = renderToStaticMarkup(<RequestsTable requests={[sample]} />);
 
     expect(html).toContain("Нужен доступ");
+    expect(html).toContain(`href="/requests/${sample.id}"`);
     expect(html).toContain("Операции");
     expect(html).toContain("Высокий");
     expect(html).toContain("Открыта");

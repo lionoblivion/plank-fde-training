@@ -1,8 +1,23 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-import { createRequestAction } from "./actions";
-import { listRequests, resetRequestStore } from "@/lib/requests";
+import { createRequestAction, setStatus } from "./actions";
+import {
+  createRequest,
+  getRequest,
+  listRequests,
+  resetRequestStore,
+} from "@/lib/requests";
+
+vi.mock("next/cache", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next/cache")>();
+  return {
+    ...actual,
+    refresh: vi.fn(),
+  };
+});
+
+import { refresh } from "next/cache";
 
 function formDataFrom(entries: Record<string, string>): FormData {
   const formData = new FormData();
@@ -58,5 +73,36 @@ describe("createRequestAction", () => {
       priority: "high",
       status: "open",
     });
+  });
+});
+
+describe("setStatus", () => {
+  beforeEach(() => {
+    resetRequestStore();
+    vi.mocked(refresh).mockClear();
+  });
+
+  it("обновляет статус и вызывает refresh", async () => {
+    const created = createRequest({
+      title: "На смену статуса",
+      team: "operations",
+    });
+
+    await setStatus(created.id, "in_progress");
+
+    expect((await getRequest(created.id))?.status).toBe("in_progress");
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it("не пишет неизвестный статус", async () => {
+    const created = createRequest({
+      title: "Защита enum",
+      team: "finance",
+    });
+
+    await expect(setStatus(created.id, "closed")).rejects.toThrow();
+
+    expect((await getRequest(created.id))?.status).toBe("open");
+    expect(refresh).not.toHaveBeenCalled();
   });
 });

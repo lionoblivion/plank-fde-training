@@ -1,9 +1,14 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { createRequest, requestSchema } from "@/lib/requests";
+import {
+  createRequest,
+  requestSchema,
+  updateRequestStatus,
+} from "@/lib/requests";
 
 export type CreateRequestState = {
   errors?: {
@@ -55,4 +60,14 @@ export async function createRequestAction(
 
   createRequest(parsed.data);
   redirect("/requests");
+}
+
+/**
+ * Меняет статус заявки с detail-страницы.
+ * Вызывать как formAction: setStatus.bind(null, id, status).
+ */
+export async function setStatus(id: string, status: string): Promise<void> {
+  // updateRequestStatus сверяет status с enum схемы до записи
+  updateRequestStatus(id, status);
+  refresh();
 }

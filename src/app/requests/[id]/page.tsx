@@ -56,7 +56,8 @@ export default function RequestDetailPage({ params }: RequestDetailPageProps) {
         <CardHeader>
           <CardTitle>Заявка</CardTitle>
           <CardDescription>
-            Полные данные заявки: команда, приоритет и статус.
+            Полные данные заявки: команда, приоритет и статус. Смена статуса —
+            кнопками ниже.
           </CardDescription>
         </CardHeader>
         <CardContent>
