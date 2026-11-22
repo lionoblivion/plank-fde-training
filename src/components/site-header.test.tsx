@@ -10,6 +10,7 @@ describe("SiteHeader", () => {
     expect(html).toContain("WorkBot");
     expect(html).toContain('href="/"');
     expect(html).toContain('href="/requests"');
-    expect(html).toContain('href="/settings"');
+    expect(html).toContain('href="/admin"');
+    expect(html).toContain('href="/admin/settings"');
   });
 });
