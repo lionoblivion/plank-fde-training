@@ -1,21 +1,30 @@
 ---
-description: Нумерация feature-веток feat/NNNN-задача
+description: Feature-ветки feat/WB-N по тикетам Linear
 alwaysApply: true
 ---
 
 # Именование веток
 
-Все feature-ветки создавайте в формате:
+Задача и ветка **совпадают с тикетом Linear** команды WB:
+https://linear.app/lev789/team/WB/all
+
+Формат:
 
 ```text
-feat/<NNNN>-<задача>
+feat/WB-<N>
 ```
 
-- `<NNNN>` — четырёхзначный порядковый номер (`0001`, `0002`, …)
-- `<задача>` — краткий kebab-case slug без пробелов и кавычек
+- `<N>` — номер issue в Linear (`WB-11` → ветка `feat/WB-11`)
+- Без kebab-slug после id: не `feat/WB-11-settings`, не `feat/0011-…`
 
-Примеры: `feat/0001-health`, `feat/0011-claude-skills`.
+Примеры:
 
-Перед `git switch -c` посмотрите существующие `feat/NNNN-*` (локально и на `origin`) и возьмите следующий номер.
+```text
+✅ feat/WB-9
+✅ feat/WB-11
+❌ feat/0026-admin-layout
+❌ feat/WB-11-admin-settings
+❌ feat/admin-layout
+```
 
-Не используйте ветки вида `feat/health` без номера.
+Перед `git switch -c` откройте тикет в Linear (или MCP) и используйте **тот же** id. Не придумывайте номера вне backlog WB.

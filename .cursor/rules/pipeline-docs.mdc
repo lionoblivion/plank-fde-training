@@ -1,11 +1,11 @@
 ---
-description: Обновлять docs/pipeline.md при изменениях пайплайна
+description: Обновлять пайплайн.md при изменениях пайплайна
 alwaysApply: true
 ---
 
 # Документация пайплайна
 
-Источник правды: `docs/pipeline.md`.
+Источник правды: `../doc-plank-fde-training/пайплайн.md` (локальная папка, не пушить).
 
 Если меняется любой элемент delivery-пайплайна:
 
@@ -14,12 +14,12 @@ alwaysApply: true
 - деплой / Vercel-процесс
 - Skills в `.claude/skills/`
 - Subagents в `.claude/agents/`
-- Hooks в `.claude/settings.json`
-- соглашения о ветках / PR / merge
+- Hooks в `.claude/settings.json` / `.cursor/hooks.json`
+- соглашения о ветках / PR / merge / коммитах (Linear WB)
 
-то в том же изменении (том же PR) обновите:
+то в том же изменении обновите:
 
-1. `docs/pipeline.md` — нумерацию этапов, колонку «Что делает», диаграмму и таблицы
+1. `../doc-plank-fde-training/пайплайн.md` — нумерацию этапов, «Что делает», диаграмму и таблицы
 2. раздел «Инструменты Claude Code» в `AGENTS.md`, если затронуты Skills / Subagents / Hook
 
 Не оставляйте документацию пайплайна устаревшей.

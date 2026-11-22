@@ -1,5 +1,5 @@
 ---
-description: Трекинг этапов пайплайна в md-файле на каждую задачу
+description: Трекинг этапов пайплайна в md-файле на каждую задачу Linear
 alwaysApply: true
 ---
 
@@ -7,10 +7,11 @@ alwaysApply: true
 
 Перед началом каждой delivery-задачи создай (если ещё нет) файл в локальной папке:
 
-`../doc-plank-fde-training/циклы/<NNNN>-<kebab-название>.md`
+`../doc-plank-fde-training/циклы/WB-<N>-<kebab-название>.md`
 
-- `<NNNN>` — номер из ветки `feat/<NNNN>-…` (тот же, что в коммите)
-- `<kebab-название>` — краткий slug задачи
+- `WB-<N>` — id тикета Linear (как ветка `feat/WB-<N>` и коммиты)
+- `<kebab-название>` — краткий slug по названию из Linear
+- Источник задач: https://linear.app/lev789/team/WB/all
 - Папка **локальная**: коммить только в `doc-plank-fde-training`, **не пушить**
 
 ## Статусы (обязательно)
