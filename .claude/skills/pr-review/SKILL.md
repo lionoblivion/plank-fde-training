@@ -16,11 +16,11 @@ argument-hint: "[номер-PR]"
 2. Прочитай блок `## Risk Assessment` (`Level`, `Review mode`, `Required reviewers`).
 3. Если блока нет — сначала выставь Risk Assessment по правилам пайплайна (LOW/MEDIUM/HIGH), запиши в цикл, затем продолжай.
 
-| Level  | Review mode | Кого запускать |
-| ------ | ----------- | -------------- |
+| Level  | Review mode | Кого запускать                                                                                                                                                                                                                        |
+| ------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LOW    | FAST_TRACK  | Один общий Reviewer: **bug-hunter**. Если diff тривиален и `pnpm check` уже зелёный — можно **не** запускать subagents: вердикт по self-review + CI, в цикле `Agents: none` и причина. Для WB-5…WB-11 предпочтителен один bug-hunter. |
-| MEDIUM | STANDARD    | **bug-hunter** + по необходимости **performance-reviewer** и/или **security-reviewer** (если в diff есть perf/security поверхность). |
-| HIGH   | FULL        | Параллельно все трое: **bug-hunter**, **performance-reviewer**, **security-reviewer**. |
+| MEDIUM | STANDARD    | **bug-hunter** + по необходимости **performance-reviewer** и/или **security-reviewer** (если в diff есть perf/security поверхность).                                                                                                  |
+| HIGH   | FULL        | Параллельно все трое: **bug-hunter**, **performance-reviewer**, **security-reviewer**.                                                                                                                                                |
 
 После запуска **обязательно** допиши в файл цикла у этапа ревью строку вида:
 

@@ -71,12 +71,15 @@ function main() {
 
     const logPath = path.join(cyclesDir, "_usage-log.md");
     const modelLabel =
-      record.model_id || record.model || "н/д (поле model отсутствует в payload)";
+      record.model_id ||
+      record.model ||
+      "н/д (поле model отсутствует в payload)";
     let tokensLine;
     if (hasTokens) {
       const parts = [];
       if (record.input_tokens != null) parts.push(`in ${record.input_tokens}`);
-      if (record.output_tokens != null) parts.push(`out ${record.output_tokens}`);
+      if (record.output_tokens != null)
+        parts.push(`out ${record.output_tokens}`);
       if (record.cache_read_tokens != null)
         parts.push(`cache_read ${record.cache_read_tokens}`);
       if (record.cache_write_tokens != null)
