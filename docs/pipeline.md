@@ -70,7 +70,7 @@ flowchart TD
 | Hook     | PostToolUse `Edit\|Write` | Prettier на изменённый файл          | Этап 4          |
 
 Конфиг hook: `.claude/settings.json`.  
-CI: `.github/workflows/check.yml`.
+CI: `.github/workflows/check.yml` (`permissions: contents: read`).
 
 ## Правило обновления
 
