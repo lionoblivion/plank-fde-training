@@ -15,11 +15,7 @@ export const requestSchema = z.object({
     .trim()
     .min(1, "Укажите заголовок")
     .max(120, "Заголовок слишком длинный"),
-  details: z
-    .string()
-    .trim()
-    .max(5000, "Описание слишком длинное")
-    .default(""),
+  details: z.string().trim().max(5000, "Описание слишком длинное").default(""),
   team: z.enum(teams, { error: "Выберите команду" }),
   priority: z
     .enum(priorities, { error: "Выберите приоритет" })
