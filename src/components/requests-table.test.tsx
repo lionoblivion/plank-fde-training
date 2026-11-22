@@ -32,4 +32,10 @@ describe("RequestsTable", () => {
     expect(html).toContain("Открыта");
     expect(html).toContain('href="/requests/new"');
   });
+
+  it("ведёт заголовок на страницу детали заявки", () => {
+    const html = renderToStaticMarkup(<RequestsTable requests={[sample]} />);
+
+    expect(html).toContain(`href="/requests/${sample.id}"`);
+  });
 });
