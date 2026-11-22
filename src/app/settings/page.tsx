@@ -11,9 +11,9 @@ import {
 import { config } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Settings",
+  title: "Настройки",
   description:
-    "Deployment environment and commit details for this WorkBot instance.",
+    "Окружение развёртывания и сведения о коммите для этого экземпляра WorkBot.",
 };
 
 export default function SettingsPage() {
@@ -21,18 +21,18 @@ export default function SettingsPage() {
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-16">
       <Card>
         <CardHeader>
-          <CardTitle>Settings</CardTitle>
+          <CardTitle>Настройки</CardTitle>
           <CardDescription>
-            Deployment details for this WorkBot instance.
+            Сведения о развёртывании этого экземпляра WorkBot.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted-foreground">Environment</span>
+            <span className="text-muted-foreground">Окружение</span>
             <Badge variant="secondary">{config.env}</Badge>
           </div>
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted-foreground">Commit</span>
+            <span className="text-muted-foreground">Коммит</span>
             <code className="font-mono text-sm">{config.commit}</code>
           </div>
         </CardContent>

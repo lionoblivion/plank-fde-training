@@ -11,17 +11,17 @@ export function SiteHeader() {
           WorkBot
         </Link>
         <nav
-          aria-label="Main"
+          aria-label="Основная навигация"
           className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground"
         >
           <Link href="/" className="transition-colors hover:text-foreground">
-            Home
+            Главная
           </Link>
           <Link
             href="/settings"
             className="transition-colors hover:text-foreground"
           >
-            Settings
+            Настройки
           </Link>
         </nav>
       </div>

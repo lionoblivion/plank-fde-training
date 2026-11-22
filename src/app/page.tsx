@@ -14,14 +14,15 @@ export default function Home() {
             </Link>
           </h1>
           <p className="text-lg text-muted-foreground">
-            An enterprise workflow platform that helps operations, finance, and
-            support teams run work across the systems they already use.
+            Корпоративная платформа рабочих процессов: помогает командам
+            операций, финансов и поддержки вести работу в уже используемых
+            системах.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button render={<Link href="/settings" />}>Settings</Button>
+          <Button render={<Link href="/settings" />}>Настройки</Button>
           <Button variant="outline" render={<Link href="/api/health" />}>
-            Health
+            Состояние
           </Button>
         </div>
       </main>
