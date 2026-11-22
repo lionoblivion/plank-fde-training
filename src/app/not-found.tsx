@@ -13,14 +13,14 @@ export default function NotFound() {
       </p>
       <div className="-mt-[min(28vw,9rem)] flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-150 fill-mode-both">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Page not found
+          Страница не найдена
         </h1>
         <p className="max-w-md text-muted-foreground">
-          This page does not exist or may have moved. Return home to continue
-          with WorkBot.
+          Такой страницы нет или она была перемещена. Вернитесь на главную,
+          чтобы продолжить работу с WorkBot.
         </p>
         <div>
-          <Button render={<Link href="/" />}>Back to home</Button>
+          <Button render={<Link href="/" />}>На главную</Button>
         </div>
       </div>
     </main>

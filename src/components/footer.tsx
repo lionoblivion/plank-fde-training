@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const links = [
-  { href: "/", label: "Home" },
-  { href: "/settings", label: "Settings" },
-  { href: "/api/health", label: "Health" },
+  { href: "/", label: "Главная" },
+  { href: "/settings", label: "Настройки" },
+  { href: "/api/health", label: "Состояние" },
 ] as const;
 
 export function Footer() {
@@ -13,11 +13,11 @@ export function Footer() {
         <div className="flex flex-col gap-1">
           <p className="text-sm font-medium tracking-tight">WorkBot</p>
           <p className="text-sm text-muted-foreground">
-            © 2026 WorkBot. All rights reserved.
+            © 2026 WorkBot. Все права защищены.
           </p>
         </div>
         <nav
-          aria-label="Footer"
+          aria-label="Подвал"
           className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground"
         >
           {links.map((link) => (

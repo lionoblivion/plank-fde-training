@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     template: "%s · WorkBot",
   },
   description:
-    "WorkBot is an enterprise workflow platform that helps operations, finance, and support teams run work across the systems they already use.",
+    "WorkBot — корпоративная платформа рабочих процессов для команд операций, финансов и поддержки.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="ru"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
