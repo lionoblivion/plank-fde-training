@@ -1,7 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { ZodError } from "zod";
 
-import { createRequest, listRequests, resetRequestStore } from "./requests";
+import {
+  buildRequestsHref,
+  createRequest,
+  listRequests,
+  parseRequestFilters,
+  resetRequestStore,
+} from "./requests";
 
 describe("requests", () => {
   beforeEach(() => {
@@ -86,6 +92,54 @@ describe("requests", () => {
       expect(listed).toHaveLength(2);
       expect(listed.map((item) => item.title)).toEqual(["Вторая", "Первая"]);
       expect(listed[0]?.status).toBe("open");
+    });
+
+    it("фильтрует список по team и status", async () => {
+      createRequest({
+        title: "Операции",
+        team: "operations",
+      });
+      createRequest({
+        title: "Поддержка",
+        team: "support",
+      });
+
+      const byTeam = await listRequests({ team: "support" });
+      expect(byTeam.map((item) => item.title)).toEqual(["Поддержка"]);
+
+      const byStatus = await listRequests({ status: "open" });
+      expect(byStatus).toHaveLength(2);
+
+      const none = await listRequests({
+        team: "support",
+        status: "done",
+      });
+      expect(none).toHaveLength(0);
+    });
+  });
+
+  describe("filters", () => {
+    it("игнорирует неизвестные значения query", () => {
+      expect(
+        parseRequestFilters({ team: "legal", status: "archived" }),
+      ).toEqual({});
+      expect(
+        parseRequestFilters({ team: "operations", status: "open" }),
+      ).toEqual({
+        team: "operations",
+        status: "open",
+      });
+      expect(parseRequestFilters({ team: "", foo: "bar" })).toEqual({});
+    });
+
+    it("собирает href с выбранными фильтрами", () => {
+      expect(buildRequestsHref({})).toBe("/requests");
+      expect(buildRequestsHref({ team: "finance" })).toBe(
+        "/requests?team=finance",
+      );
+      expect(buildRequestsHref({ team: "finance", status: "done" })).toBe(
+        "/requests?team=finance&status=done",
+      );
     });
   });
 });
