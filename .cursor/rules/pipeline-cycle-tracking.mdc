@@ -1,0 +1,45 @@
+---
+description: Трекинг цикла пайплайна, Risk/Plan и список агентов
+alwaysApply: true
+---
+
+# Трекинг цикла пайплайна
+
+Перед delivery-задачей создай файл:
+
+`../doc-plank-fde-training/циклы/WB-<N>-<kebab-название>.md`
+
+Источник задач: https://linear.app/lev789/team/WB/all  
+Папка локальная — **не пушить**.
+
+Шаблон: `../doc-plank-fde-training/циклы/_шаблон.md`.  
+Этапы: `../doc-plank-fde-training/пайплайн.md`.
+
+## Статусы
+
+| Маркер | Значение |
+| ------ | -------- |
+| `[ ]`  | Не начато |
+| `[~]`  | В процессе |
+| `[x]`  | Выполнено |
+| `[!]`  | Ошибка + причина |
+| `[-]`  | Пропущено + причина |
+
+## Обязательные блоки в файле
+
+1. **Risk Assessment** (этап 2.1) — Level, Reason, Review mode, Required reviewers/tests.
+2. **Implementation Plan** (этап 2.2) — файлы, тесты↔AC, Skills, риски. Без отдельного агента.
+3. **Цикл** — все этапы 1…14 и 2.1/2.2 со статусами.
+4. **Agents** — при любом вызове Skill/Subagent укажи в строке этапа, например:
+   - `· Agents: bug-hunter`
+   - `· Agents: bug-hunter, security-reviewer`
+   - `· Agents: none — LOW trivial + CI`
+   - этап 4: `· Skills: /component`
+
+## Порядок критичных шагов
+
+Exploring → Risk Assessment → Implementation Plan → ветка → код → Self-Review → `pnpm check` → … → Review Policy по уровню риска.
+
+## Usage
+
+См. `pipeline-usage-report.mdc`: токены/модель только из stop-hook (`циклы/_last-turn-usage.json`), без выдумок.

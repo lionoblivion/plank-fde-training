@@ -26,11 +26,10 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
 5. Комментарии в коде пишите на русском языке. Имена в коде (функции, типы, файлы) — на английском.
 6. Изменение готово, только когда `pnpm check` проходит.
 7. Секреты не коммитьте. Переменные окружения хранятся в `.env.local` и в настройках Vercel.
-8. Ветки именуйте `feat/<NNNN>-<задача>`: четырёхзначный порядковый номер и краткий kebab-case slug задачи.
-   Примеры: `feat/0001-health`, `feat/0011-add-vitest`. Следующий номер — на единицу больше последнего `feat/NNNN-*` в репозитории.
-   Не используйте формат без номера (`feat/health`).
+8. Задачи и ветки совпадают с Linear (команда WB): ветка `feat/WB-<N>` (например `feat/WB-11`).
+   Коммит: `WB-<N>: <название задачи из Linear>`; подробности — в body. Список: https://linear.app/lev789/team/WB/all
 9. При любом изменении пайплайна (скрипты `check`/`test`, GitHub Actions, Vercel, Skills, Subagents, Hooks, процесс PR)
-   обновляйте `docs/pipeline.md`. Если затронуты Skills / Subagents / Hook — синхронизируйте и раздел ниже.
+   обновляйте `../doc-plank-fde-training/пайплайн.md`. Если затронуты Skills / Subagents / Hook — синхронизируйте и раздел ниже.
 
 ## Инструменты Claude Code
 
@@ -39,13 +38,15 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
 - `/component` — создаёт React-компонент в `src/components/` и соседний Vitest-тест по паттернам проекта.
 - `/api-route` — создаёт API-маршрут в `src/app/api/` со схемами Zod, обработчиками и тестами.
 - `/pre-deploy` — прогоняет typecheck, тесты, поиск `console.log` и сверку env перед выкладкой.
-- `/pr-review` — параллельно запускает трёх ревьюеров по diff PR или ветки и собирает общий вердикт.
+- `/pr-review` — ревью по Review Policy (число агентов от Risk Assessment LOW/MEDIUM/HIGH); в файле цикла указать вызванных Agents.
 
 ### Subagents
 
-- **Bug Hunter** — ищет ошибки логики, null/undefined, Promise и race conditions.
-- **Performance Reviewer** — ищет проблемы производительности, лишние await, bundle и ненужный `"use client"`.
-- **Security Reviewer** — ищет injection, проблемы auth, утечки секретов и небезопасную обработку данных.
+Запуск **условный** (см. Review Policy в `../doc-plank-fde-training/пайплайн.md`):
+
+- **Bug Hunter** — логика, null/undefined, Promise, race (часто единственный на LOW).
+- **Performance Reviewer** — await, bundle, лишний `"use client"` (MEDIUM по необходимости / HIGH всегда).
+- **Security Reviewer** — injection, auth, секреты (MEDIUM по необходимости / HIGH всегда).
 
 ### Hook
 
