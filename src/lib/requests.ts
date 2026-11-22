@@ -1,16 +1,25 @@
 import { z } from "zod";
 
-/** Команды из брифа курса Plank Day 3. */
-export const teams = ["operations", "finance", "support"] as const;
+import { priorities, teams } from "@/lib/request-options";
 
-/** Уровни приоритета для badges и фильтров списка. */
-export const priorities = ["low", "medium", "high"] as const;
+export {
+  priorities,
+  priorityLabels,
+  teamLabels,
+  teams,
+} from "@/lib/request-options";
 
 export const requestSchema = z.object({
-  title: z.string().trim().min(1, "Title is required"),
-  details: z.string().trim().default(""),
-  team: z.enum(teams),
-  priority: z.enum(priorities).default("medium"),
+  title: z
+    .string()
+    .trim()
+    .min(1, "Укажите заголовок")
+    .max(120, "Заголовок слишком длинный"),
+  details: z.string().trim().max(5000, "Описание слишком длинное").default(""),
+  team: z.enum(teams, { error: "Выберите команду" }),
+  priority: z
+    .enum(priorities, { error: "Выберите приоритет" })
+    .default("medium"),
 });
 
 export type Request = z.infer<typeof requestSchema>;
