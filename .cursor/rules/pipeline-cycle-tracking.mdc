@@ -39,3 +39,7 @@ alwaysApply: true
 ## Порядок критичных шагов
 
 Exploring → Risk Assessment → Implementation Plan → ветка → код → Self-Review → `pnpm check` → … → Review Policy по уровню риска.
+
+## Usage
+
+См. `pipeline-usage-report.mdc`: токены/модель только из stop-hook (`циклы/_last-turn-usage.json`), без выдумок.
