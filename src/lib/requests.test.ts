@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { ZodError } from "zod";
 
 import {
+  buildRequestsHref,
   countRequestsByStatus,
   createRequest,
   getRequest,
   listRequests,
+  parseRequestFilters,
   resetRequestStore,
   updateRequestStatus,
   type WorkRequest,
@@ -96,6 +98,29 @@ describe("requests", () => {
       expect(listed[0]?.status).toBe("open");
     });
 
+    it("фильтрует список по team и status", async () => {
+      createRequest({
+        title: "Операции",
+        team: "operations",
+      });
+      createRequest({
+        title: "Поддержка",
+        team: "support",
+      });
+
+      const byTeam = await listRequests({ team: "support" });
+      expect(byTeam.map((item) => item.title)).toEqual(["Поддержка"]);
+
+      const byStatus = await listRequests({ status: "open" });
+      expect(byStatus).toHaveLength(2);
+
+      const none = await listRequests({
+        team: "support",
+        status: "done",
+      });
+      expect(none).toHaveLength(0);
+    });
+
     it("возвращает заявку по id и undefined для неизвестного", async () => {
       const created = createRequest({
         title: "Деталь",
@@ -106,6 +131,31 @@ describe("requests", () => {
       await expect(
         getRequest("00000000-0000-4000-8000-000000000000"),
       ).resolves.toBeUndefined();
+    });
+  });
+
+  describe("filters", () => {
+    it("игнорирует неизвестные значения query", () => {
+      expect(
+        parseRequestFilters({ team: "legal", status: "archived" }),
+      ).toEqual({});
+      expect(
+        parseRequestFilters({ team: "operations", status: "open" }),
+      ).toEqual({
+        team: "operations",
+        status: "open",
+      });
+      expect(parseRequestFilters({ team: "", foo: "bar" })).toEqual({});
+    });
+
+    it("собирает href с выбранными фильтрами", () => {
+      expect(buildRequestsHref({})).toBe("/requests");
+      expect(buildRequestsHref({ team: "finance" })).toBe(
+        "/requests?team=finance",
+      );
+      expect(buildRequestsHref({ team: "finance", status: "done" })).toBe(
+        "/requests?team=finance&status=done",
+      );
     });
   });
 

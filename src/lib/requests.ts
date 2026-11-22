@@ -36,6 +36,50 @@ export const workRequestSchema = requestSchema.extend({
 export type Request = z.infer<typeof requestSchema>;
 export type WorkRequest = z.infer<typeof workRequestSchema>;
 
+/**
+ * Query-фильтры списка. Неизвестные значения становятся undefined
+ * (показываем полный список вместо ошибки).
+ */
+export const requestFiltersSchema = z.object({
+  team: z.enum(teams).optional().catch(undefined),
+  status: z.enum(statuses).optional().catch(undefined),
+});
+
+export type RequestFilters = z.infer<typeof requestFiltersSchema>;
+
+/** Берёт первый query-параметр, если пришёл массив. */
+function firstSearchParam(
+  value: string | string[] | undefined,
+): string | undefined {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+  return value;
+}
+
+/** Парсит searchParams страницы `/requests` без падения на мусоре. */
+export function parseRequestFilters(
+  searchParams: Record<string, string | string[] | undefined>,
+): RequestFilters {
+  return requestFiltersSchema.parse({
+    team: firstSearchParam(searchParams.team),
+    status: firstSearchParam(searchParams.status),
+  });
+}
+
+/** Собирает href списка с текущими фильтрами. */
+export function buildRequestsHref(filters: RequestFilters): string {
+  const params = new URLSearchParams();
+  if (filters.team) {
+    params.set("team", filters.team);
+  }
+  if (filters.status) {
+    params.set("status", filters.status);
+  }
+  const query = params.toString();
+  return query ? `/requests?${query}` : "/requests";
+}
+
 const STORE_KEY = "__workbot_requests__";
 
 type GlobalWithRequests = typeof globalThis & {
@@ -68,9 +112,18 @@ export function createRequest(input: unknown): WorkRequest {
 }
 
 /** Список заявок, новые сверху. io() помечает чтение как request-time. */
-export async function listRequests(): Promise<WorkRequest[]> {
+export async function listRequests(
+  filters: RequestFilters = {},
+): Promise<WorkRequest[]> {
   await io();
-  return [...getStore()].reverse();
+  let listed = [...getStore()].reverse();
+  if (filters.team) {
+    listed = listed.filter((request) => request.team === filters.team);
+  }
+  if (filters.status) {
+    listed = listed.filter((request) => request.status === filters.status);
+  }
+  return listed;
 }
 
 /** Заявка по id или undefined, если нет. io() — request-time чтение. */
