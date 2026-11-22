@@ -4,6 +4,7 @@ const links = [
   { href: "/", label: "Главная" },
   { href: "/settings", label: "Настройки" },
   { href: "/api/health", label: "Состояние" },
+  { href: "/vika", label: "Для Вики ♥" },
 ] as const;
 
 export function Footer() {
