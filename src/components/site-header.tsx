@@ -1,0 +1,30 @@
+import Link from "next/link";
+
+export function SiteHeader() {
+  return (
+    <header className="border-b border-border">
+      <div className="mx-auto flex w-full max-w-2xl items-center justify-between gap-4 px-6 py-4">
+        <Link
+          href="/"
+          className="text-sm font-medium tracking-tight transition-colors hover:text-foreground"
+        >
+          WorkBot
+        </Link>
+        <nav
+          aria-label="Main"
+          className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground"
+        >
+          <Link href="/" className="transition-colors hover:text-foreground">
+            Home
+          </Link>
+          <Link
+            href="/settings"
+            className="transition-colors hover:text-foreground"
+          >
+            Settings
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
+}
