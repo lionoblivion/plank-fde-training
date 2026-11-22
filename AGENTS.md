@@ -15,6 +15,8 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
 - `src/components/ui/` — компоненты shadcn/ui, генерируются CLI
 - `src/components/` — собственные компоненты
 - `src/lib/` — общий код и утилиты
+- `content/policies/` — политики компании (Markdown + front matter)
+- Folder-level `CLAUDE.md` (например `src/app/api/CLAUDE.md`, `content/policies/CLAUDE.md`) — локальные правила модуля; подгружаются при работе с этой папкой.
 
 ## Соглашения
 

@@ -24,6 +24,12 @@ export function SiteHeader() {
             Заявки
           </Link>
           <Link
+            href="/policies"
+            className="transition-colors hover:text-foreground"
+          >
+            Политики
+          </Link>
+          <Link
             href="/admin"
             className="transition-colors hover:text-foreground"
           >
