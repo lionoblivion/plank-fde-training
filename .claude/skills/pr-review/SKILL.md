@@ -49,18 +49,23 @@ argument-hint: "[номер-PR]"
 Источник: `gh pr diff <N>` | `git diff main...HEAD`
 
 ## Critical
+
 - ...
 
 ## High
+
 - ...
 
 ## Medium
+
 - ...
 
 ## Low
+
 - ...
 
 ## Вердикт
+
 ...
 ```
 
