@@ -2,10 +2,8 @@
 
 import { useActionState } from "react";
 
-import {
-  createRequestAction,
-  type CreateRequestState,
-} from "@/app/requests/actions";
+import { createRequestAction } from "@/app/requests/actions";
+import type { CreateRequestState } from "@/app/requests/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +12,12 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
-import { priorities, priorityLabels, teamLabels, teams } from "@/lib/requests";
+import {
+  priorities,
+  priorityLabels,
+  teamLabels,
+  teams,
+} from "@/lib/request-options";
 
 const initialState: CreateRequestState = {};
 
@@ -45,6 +48,7 @@ export function RequestForm() {
           name="title"
           required
           aria-invalid={Boolean(state.errors?.title)}
+          defaultValue={state.values?.title ?? ""}
           placeholder="Кратко о сути заявки"
         />
         <FieldError messages={state.errors?.title} />
@@ -56,6 +60,7 @@ export function RequestForm() {
           id="details"
           name="details"
           aria-invalid={Boolean(state.errors?.details)}
+          defaultValue={state.values?.details ?? ""}
           placeholder="Подробности, контекст, ожидаемый результат"
         />
         <FieldError messages={state.errors?.details} />
@@ -69,7 +74,7 @@ export function RequestForm() {
           required
           className="w-full"
           aria-invalid={Boolean(state.errors?.team)}
-          defaultValue=""
+          defaultValue={state.values?.team ?? ""}
         >
           <NativeSelectOption value="" disabled>
             Выберите команду
@@ -90,7 +95,7 @@ export function RequestForm() {
           name="priority"
           className="w-full"
           aria-invalid={Boolean(state.errors?.priority)}
-          defaultValue="medium"
+          defaultValue={state.values?.priority ?? "medium"}
         >
           {priorities.map((priority) => (
             <NativeSelectOption key={priority} value={priority}>
