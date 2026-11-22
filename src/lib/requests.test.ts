@@ -23,7 +23,7 @@ describe("requests", () => {
   });
 
   describe("defaults", () => {
-    it("ставит priority=medium и пустой details, если их не передали", () => {
+    it("ставит priority=medium, status=open и пустой details", () => {
       const request = createRequest({
         title: "Заявка без опций",
         team: "finance",
@@ -31,6 +31,11 @@ describe("requests", () => {
 
       expect(request.priority).toBe("medium");
       expect(request.details).toBe("");
+      expect(request.status).toBe("open");
+      expect(request.id).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+      );
+      expect(request.createdAt).toBeInstanceOf(Date);
     });
   });
 
@@ -65,7 +70,7 @@ describe("requests", () => {
   });
 
   describe("store", () => {
-    it("сохраняет заявки в общем списке через globalThis", () => {
+    it("сохраняет заявки в общем списке, новые сверху", async () => {
       createRequest({
         title: "Первая",
         team: "operations",
@@ -76,10 +81,11 @@ describe("requests", () => {
         priority: "low",
       });
 
-      const listed = listRequests();
+      const listed = await listRequests();
 
       expect(listed).toHaveLength(2);
-      expect(listed.map((item) => item.title)).toEqual(["Первая", "Вторая"]);
+      expect(listed.map((item) => item.title)).toEqual(["Вторая", "Первая"]);
+      expect(listed[0]?.status).toBe("open");
     });
   });
 });

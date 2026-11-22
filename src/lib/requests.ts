@@ -1,14 +1,18 @@
+import { io } from "next/cache";
 import { z } from "zod";
 
-import { priorities, teams } from "@/lib/request-options";
+import { priorities, statuses, teams } from "@/lib/request-options";
 
 export {
   priorities,
   priorityLabels,
+  statusLabels,
+  statuses,
   teamLabels,
   teams,
 } from "@/lib/request-options";
 
+/** Схема полей формы / API (без id и статуса). */
 export const requestSchema = z.object({
   title: z
     .string()
@@ -22,15 +26,23 @@ export const requestSchema = z.object({
     .default("medium"),
 });
 
+/** Полная заявка в хранилище. */
+export const workRequestSchema = requestSchema.extend({
+  id: z.string().uuid(),
+  status: z.enum(statuses).default("open"),
+  createdAt: z.date(),
+});
+
 export type Request = z.infer<typeof requestSchema>;
+export type WorkRequest = z.infer<typeof workRequestSchema>;
 
 const STORE_KEY = "__workbot_requests__";
 
 type GlobalWithRequests = typeof globalThis & {
-  [STORE_KEY]?: Request[];
+  [STORE_KEY]?: WorkRequest[];
 };
 
-function getStore(): Request[] {
+function getStore(): WorkRequest[] {
   const globalWithStore = globalThis as GlobalWithRequests;
   if (!globalWithStore[STORE_KEY]) {
     globalWithStore[STORE_KEY] = [];
@@ -43,12 +55,20 @@ export function resetRequestStore(): void {
   getStore().length = 0;
 }
 
-export function createRequest(input: unknown): Request {
-  const request = requestSchema.parse(input);
+export function createRequest(input: unknown): WorkRequest {
+  const fields = requestSchema.parse(input);
+  const request = workRequestSchema.parse({
+    ...fields,
+    id: crypto.randomUUID(),
+    status: "open",
+    createdAt: new Date(),
+  });
   getStore().push(request);
   return request;
 }
 
-export function listRequests(): Request[] {
-  return [...getStore()];
+/** Список заявок, новые сверху. io() помечает чтение как request-time. */
+export async function listRequests(): Promise<WorkRequest[]> {
+  await io();
+  return [...getStore()].reverse();
 }
