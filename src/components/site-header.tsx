@@ -18,6 +18,12 @@ export function SiteHeader() {
             Главная
           </Link>
           <Link
+            href="/requests"
+            className="transition-colors hover:text-foreground"
+          >
+            Заявки
+          </Link>
+          <Link
             href="/settings"
             className="transition-colors hover:text-foreground"
           >

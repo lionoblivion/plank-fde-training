@@ -28,7 +28,7 @@ describe("createRequestAction", () => {
 
     expect(state.errors?.title?.[0]).toBeTruthy();
     expect(state.errors?.team?.[0]).toBeTruthy();
-    expect(listRequests()).toHaveLength(0);
+    expect(await listRequests()).toHaveLength(0);
   });
 
   it("создаёт заявку и делает redirect на /requests", async () => {
@@ -48,13 +48,15 @@ describe("createRequestAction", () => {
     }
 
     expect(isRedirectError(caught)).toBe(true);
-    expect(listRequests()).toEqual([
-      {
-        title: "Нужен доступ",
-        details: "К VPN",
-        team: "operations",
-        priority: "high",
-      },
-    ]);
+
+    const listed = await listRequests();
+    expect(listed).toHaveLength(1);
+    expect(listed[0]).toMatchObject({
+      title: "Нужен доступ",
+      details: "К VPN",
+      team: "operations",
+      priority: "high",
+      status: "open",
+    });
   });
 });
