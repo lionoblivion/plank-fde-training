@@ -125,3 +125,18 @@ export async function listRequests(
   }
   return listed;
 }
+
+export type StatusCounts = Record<(typeof statuses)[number], number>;
+
+/** Считает заявки по каждому статусу (включая нули). */
+export function countRequestsByStatus(requests: WorkRequest[]): StatusCounts {
+  const counts: StatusCounts = {
+    open: 0,
+    in_progress: 0,
+    done: 0,
+  };
+  for (const request of requests) {
+    counts[request.status] += 1;
+  }
+  return counts;
+}
