@@ -5,6 +5,7 @@ import {
   buildRequestsHref,
   countRequestsByStatus,
   createRequest,
+  getRequest,
   listRequests,
   parseRequestFilters,
   resetRequestStore,
@@ -117,6 +118,18 @@ describe("requests", () => {
         status: "done",
       });
       expect(none).toHaveLength(0);
+    });
+
+    it("возвращает заявку по id и undefined для неизвестного", async () => {
+      const created = createRequest({
+        title: "Деталь",
+        team: "finance",
+      });
+
+      await expect(getRequest(created.id)).resolves.toEqual(created);
+      await expect(
+        getRequest("00000000-0000-4000-8000-000000000000"),
+      ).resolves.toBeUndefined();
     });
   });
 
