@@ -29,6 +29,25 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
    Примеры: `feat/0001-health`, `feat/0011-add-vitest`. Следующий номер — на единицу больше последнего `feat/NNNN-*` в репозитории.
    Не используйте формат без номера (`feat/health`).
 
+## Инструменты Claude Code
+
+### Skills
+
+- `/component` — создаёт React-компонент в `src/components/` и соседний Vitest-тест по паттернам проекта.
+- `/api-route` — создаёт API-маршрут в `src/app/api/` со схемами Zod, обработчиками и тестами.
+- `/pre-deploy` — прогоняет typecheck, тесты, поиск `console.log` и сверку env перед выкладкой.
+- `/pr-review` — параллельно запускает трёх ревьюеров по diff PR или ветки и собирает общий вердикт.
+
+### Subagents
+
+- **Bug Hunter** — ищет ошибки логики, null/undefined, Promise и race conditions.
+- **Performance Reviewer** — ищет проблемы производительности, лишние await, bundle и ненужный `"use client"`.
+- **Security Reviewer** — ищет injection, проблемы auth, утечки секретов и небезопасную обработку данных.
+
+### Hook
+
+- **Prettier после Edit|Write** — PostToolUse hook в `.claude/settings.json` форматирует изменённый файл через Prettier сразу после записи.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
