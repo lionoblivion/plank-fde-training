@@ -1,0 +1,25 @@
+---
+description: Обновлять docs/pipeline.md при изменениях пайплайна
+alwaysApply: true
+---
+
+# Документация пайплайна
+
+Источник правды: `docs/pipeline.md`.
+
+Если меняется любой элемент delivery-пайплайна:
+
+- скрипты в `package.json` (`check`, `test`, `typecheck`, …)
+- `.github/workflows/*`
+- деплой / Vercel-процесс
+- Skills в `.claude/skills/`
+- Subagents в `.claude/agents/`
+- Hooks в `.claude/settings.json`
+- соглашения о ветках / PR / merge
+
+то в том же изменении (том же PR) обновите:
+
+1. `docs/pipeline.md` — нумерацию этапов, колонку «Что делает», диаграмму и таблицы
+2. раздел «Инструменты Claude Code» в `AGENTS.md`, если затронуты Skills / Subagents / Hook
+
+Не оставляйте документацию пайплайна устаревшей.

@@ -28,6 +28,8 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
 7. Ветки именуйте `feat/<NNNN>-<задача>`: четырёхзначный порядковый номер и краткий kebab-case slug задачи.
    Примеры: `feat/0001-health`, `feat/0011-add-vitest`. Следующий номер — на единицу больше последнего `feat/NNNN-*` в репозитории.
    Не используйте формат без номера (`feat/health`).
+8. При любом изменении пайплайна (скрипты `check`/`test`, GitHub Actions, Vercel, Skills, Subagents, Hooks, процесс PR)
+   обновляйте `docs/pipeline.md`. Если затронуты Skills / Subagents / Hook — синхронизируйте и раздел ниже.
 
 ## Инструменты Claude Code
 
