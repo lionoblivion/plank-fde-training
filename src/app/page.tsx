@@ -24,12 +24,6 @@ export default function Home() {
           <Button variant="outline" render={<Link href="/api/health" />}>
             Состояние
           </Button>
-          <Button
-            className="bg-rose-600 text-white hover:bg-rose-700"
-            render={<Link href="/vika" />}
-          >
-            Для Вики ♥
-          </Button>
         </div>
       </main>
       <Footer />
