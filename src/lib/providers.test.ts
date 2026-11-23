@@ -414,6 +414,138 @@ describe("openai provider", () => {
     ).rejects.toThrow(/boom from api/);
   });
 
+  it("response.incomplete отдаёт usage (ответ обрезан, не failed)", async () => {
+    const fetchMock = vi.fn(async () =>
+      sseResponse(
+        sseBody([
+          {
+            event: "response.created",
+            data: {
+              type: "response.created",
+              sequence_number: 0,
+              response: {
+                id: "resp_inc",
+                object: "response",
+                created_at: 1,
+                status: "in_progress",
+                model: "gpt-4.1-mini",
+                output: [],
+                error: null,
+                incomplete_details: null,
+                instructions: null,
+                metadata: {},
+                parallel_tool_calls: true,
+                temperature: 1,
+                tool_choice: "auto",
+                tools: [],
+                top_p: 1,
+                truncation: "disabled",
+                usage: null,
+              },
+            },
+          },
+          {
+            event: "response.output_item.added",
+            data: {
+              type: "response.output_item.added",
+              sequence_number: 1,
+              output_index: 0,
+              item: {
+                id: "msg_1",
+                type: "message",
+                role: "assistant",
+                status: "in_progress",
+                content: [],
+              },
+            },
+          },
+          {
+            event: "response.content_part.added",
+            data: {
+              type: "response.content_part.added",
+              sequence_number: 2,
+              item_id: "msg_1",
+              output_index: 0,
+              content_index: 0,
+              part: { type: "output_text", text: "", annotations: [] },
+            },
+          },
+          {
+            event: "response.output_text.delta",
+            data: {
+              type: "response.output_text.delta",
+              sequence_number: 3,
+              item_id: "msg_1",
+              output_index: 0,
+              content_index: 0,
+              delta: "partial",
+            },
+          },
+          {
+            event: "response.incomplete",
+            data: {
+              type: "response.incomplete",
+              sequence_number: 4,
+              response: {
+                id: "resp_inc",
+                object: "response",
+                created_at: 1,
+                status: "incomplete",
+                model: "gpt-4.1-mini",
+                output: [
+                  {
+                    id: "msg_1",
+                    type: "message",
+                    role: "assistant",
+                    status: "incomplete",
+                    content: [
+                      {
+                        type: "output_text",
+                        text: "partial",
+                        annotations: [],
+                      },
+                    ],
+                  },
+                ],
+                error: null,
+                incomplete_details: { reason: "max_output_tokens" },
+                instructions: null,
+                metadata: {},
+                parallel_tool_calls: true,
+                temperature: 1,
+                tool_choice: "auto",
+                tools: [],
+                top_p: 1,
+                truncation: "disabled",
+                usage: {
+                  input_tokens: 5,
+                  output_tokens: 1,
+                  total_tokens: 6,
+                  input_tokens_details: { cached_tokens: 0 },
+                  output_tokens_details: { reasoning_tokens: 0 },
+                },
+              },
+            },
+          },
+        ]),
+      ),
+    );
+
+    const provider = openai({
+      apiKey: "test-openai-key",
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+
+    const chunks: string[] = [];
+    const usage = await provider.stream(
+      { messages: [{ role: "user", content: "x" }], maxTokens: 1 },
+      (text) => chunks.push(text),
+    );
+
+    expect(chunks).toEqual(["partial"]);
+    expect(usage).toEqual({ inputTokens: 5, outputTokens: 1 });
+  });
+
   it("не создаёт SDK до первого stream", () => {
     expect(() => openai({ apiKey: undefined })).not.toThrow();
   });
