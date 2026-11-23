@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { query } from "@/lib/db";
@@ -9,6 +10,7 @@ import { databaseServer } from "./database";
 
 describe("database MCP server", () => {
   let client: Client;
+  let server: McpServer;
 
   beforeEach(async () => {
     await resetRequestStore();
@@ -19,7 +21,7 @@ describe("database MCP server", () => {
       priority: "high",
     });
 
-    const server = databaseServer(query);
+    server = databaseServer(query);
     const [clientTransport, serverTransport] =
       InMemoryTransport.createLinkedPair();
     client = new Client({ name: "database-test", version: "1.0.0" });
@@ -31,6 +33,7 @@ describe("database MCP server", () => {
 
   afterEach(async () => {
     await client.close();
+    await server.close();
   });
 
   it("query возвращает строки по SQL", async () => {
@@ -128,5 +131,19 @@ describe("database MCP server", () => {
     });
 
     expect(result.isError).toBe(true);
+  });
+
+  it("query отклоняет SET и multi-statement", async () => {
+    const setResult = await client.callTool({
+      name: "query",
+      arguments: { sql: "set default_transaction_read_only = off" },
+    });
+    expect(setResult.isError).toBe(true);
+
+    const multi = await client.callTool({
+      name: "query",
+      arguments: { sql: "select 1; select 2" },
+    });
+    expect(multi.isError).toBe(true);
   });
 });
