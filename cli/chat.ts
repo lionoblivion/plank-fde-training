@@ -8,17 +8,18 @@ import { systemPrompt as defaultSystemPrompt } from "@/lib/system-prompt";
 
 type Factory = () => Provider;
 
+/** Провайдеры проекта: по умолчанию Groq (есть ключ; Anthropic без credits). */
 const factories: Record<string, Factory> = {
+  groq,
   anthropic,
   openai,
-  groq,
 };
 
 function resolveProvider(name: string): Provider {
   const factory = factories[name];
   if (!factory) {
     throw new Error(
-      `Unknown provider "${name}". Use: ${Object.keys(factories).join(", ")}`,
+      `Неизвестный провайдер "${name}". Доступны: ${Object.keys(factories).join(", ")}`,
     );
   }
   return factory();
@@ -26,22 +27,23 @@ function resolveProvider(name: string): Provider {
 
 function formatCost(session: Session): string {
   const cost = session.cost();
-  const lines = [`tokens: in ${cost.inputTokens} · out ${cost.outputTokens}`];
-  if (cost.dollars === null) {
-    lines.push(`cost: n/a (unpriced model: ${cost.unpricedModels.join(", ")})`);
-  } else {
-    lines.push(`cost: $${cost.dollars.toFixed(6)}`);
+  const lines = [
+    `токены: in ${cost.inputTokens} · out ${cost.outputTokens}`,
+    `стоимость: $${cost.dollars.toFixed(6)}`,
+  ];
+  if (cost.unpricedModels.length > 0) {
+    lines.push(`без цены: ${cost.unpricedModels.join(", ")} (в $ не входят)`);
   }
   return lines.join("\n");
 }
 
 function printHelp(): void {
-  output.write(`Commands:
+  output.write(`Команды:
   /help
   /exit
-  /cost
-  /model [provider] [model]   — list or switch
-  /system [text]              — show or replace system prompt
+  /cost                         — токены и $ за сессию
+  /model [provider] [model]     — список или смена модели
+  /system [text]                — показать или заменить system prompt
 `);
 }
 
@@ -61,7 +63,7 @@ async function main(): Promise<void> {
 
   if (values.help) {
     output.write(
-      `Usage: pnpm chat [--provider name] [--model id] [--effort low|medium|high] [--temperature 0-1] [--max-tokens n]\n`,
+      `Использование: pnpm chat [--provider name] [--model id] [--effort low|medium|high] [--temperature 0-1] [--max-tokens n]\n`,
     );
     printHelp();
     return;
@@ -71,7 +73,7 @@ async function main(): Promise<void> {
   let provider = resolveProvider(providerName);
   const model = values.model ?? provider.models[0]?.id;
   if (!model) {
-    throw new Error(`${providerName}: no models configured`);
+    throw new Error(`${providerName}: нет моделей`);
   }
 
   const temperature =
@@ -86,7 +88,7 @@ async function main(): Promise<void> {
   if (values.effort !== undefined) {
     if (!(validEfforts as readonly string[]).includes(values.effort)) {
       throw new Error(
-        `Invalid --effort "${values.effort}". Use: ${validEfforts.join(", ")}`,
+        `Неверный --effort "${values.effort}". Варианты: ${validEfforts.join(", ")}`,
       );
     }
     effort = values.effort as Effort;
@@ -101,7 +103,7 @@ async function main(): Promise<void> {
   const interactive = Boolean(input.isTTY && output.isTTY);
   if (interactive) {
     output.write(
-      `WorkBot · ${providerName} · ${session.model}\nType /help for commands.\n\n`,
+      `WorkBot · ${providerName} · ${session.model}\nКоманды: /help\n\n`,
     );
   }
 
@@ -112,21 +114,30 @@ async function main(): Promise<void> {
     ...(interactive ? { prompt: "you> " } : {}),
   });
 
-  try {
+  const again = () => {
     if (interactive) rl.prompt();
+  };
+
+  try {
+    again();
     for await (const line of rl) {
       const text = line.trim();
-      if (!text) continue;
+      if (!text) {
+        again();
+        continue;
+      }
 
       if (text === "/exit" || text === "/quit") {
         break;
       }
       if (text === "/help") {
         printHelp();
+        again();
         continue;
       }
       if (text === "/cost") {
         output.write(`${formatCost(session)}\n`);
+        again();
         continue;
       }
       if (text === "/system" || text.startsWith("/system ")) {
@@ -135,8 +146,9 @@ async function main(): Promise<void> {
           output.write(`${session.system}\n`);
         } else {
           session.setSystem(rest);
-          output.write("System prompt updated.\n");
+          output.write("System prompt обновлён.\n");
         }
+        again();
         continue;
       }
       if (text === "/model" || text.startsWith("/model ")) {
@@ -149,30 +161,36 @@ async function main(): Promise<void> {
             const price =
               m.inputPerMillion !== undefined &&
               m.outputPerMillion !== undefined
-                ? `$${m.inputPerMillion}/$${m.outputPerMillion} per 1M`
-                : "unpriced";
+                ? `$${m.inputPerMillion}/$${m.outputPerMillion} за 1M`
+                : "без цены";
             output.write(`  - ${m.id} (${price})\n`);
           }
+          again();
           continue;
         }
         const [nextProviderName, nextModel] = parts;
-        if (!nextProviderName) continue;
+        if (!nextProviderName) {
+          again();
+          continue;
+        }
         if (nextModel) {
+          // /model openai gpt-5.4-mini — id может быть не в списке → unpriced
           provider = resolveProvider(nextProviderName);
           session.use(provider, nextModel);
         } else if (factories[nextProviderName]) {
           provider = resolveProvider(nextProviderName);
           const defaultModel = provider.models[0]?.id;
           if (!defaultModel) {
-            stderr.write(`${nextProviderName}: no models\n`);
+            stderr.write(`${nextProviderName}: нет моделей\n`);
+            again();
             continue;
           }
           session.use(provider, defaultModel);
         } else {
-          // Только id модели на текущем провайдере (или произвольный unpriced)
           session.use(session.provider, nextProviderName);
         }
-        output.write(`Now: ${session.provider.name} · ${session.model}\n`);
+        output.write(`Сейчас: ${session.provider.name} · ${session.model}\n`);
+        again();
         continue;
       }
 
@@ -182,9 +200,9 @@ async function main(): Promise<void> {
         output.write("\n");
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        stderr.write(`Error: ${message}\n`);
+        stderr.write(`Ошибка: ${message}\n`);
       }
-      if (interactive) rl.prompt();
+      again();
     }
   } finally {
     rl.close();
