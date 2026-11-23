@@ -16,6 +16,7 @@ export const config = {
   /** Ключи LLM — только сервер (см. providers.ts) */
   anthropicApiKey: process.env.ANTHROPIC_API_KEY,
   openaiApiKey: process.env.OPENAI_API_KEY,
+  groqApiKey: process.env.GROQ_API_KEY,
   /** Хост capture API, без trailing slash (только https) */
   posthogHost: (() => {
     const raw = process.env.POSTHOG_HOST ?? "https://us.i.posthog.com";

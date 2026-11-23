@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { anthropic, openai } from "./providers";
+import { anthropic, groq, openai } from "./providers";
 
 /** SSE из пар event/data — двойной перевод строки после каждого события. */
 function sseBody(events: Array<{ event: string; data: unknown }>): string {
@@ -9,6 +9,14 @@ function sseBody(events: Array<{ event: string; data: unknown }>): string {
       ({ event, data }) => `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`,
     )
     .join("");
+}
+
+/** Chat Completions SSE: только data-строки + [DONE]. */
+function chatSseBody(chunks: unknown[]): string {
+  return (
+    chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join("") +
+    "data: [DONE]\n\n"
+  );
 }
 
 function sseResponse(body: string): Response {
@@ -548,5 +556,112 @@ describe("openai provider", () => {
 
   it("не создаёт SDK до первого stream", () => {
     expect(() => openai({ apiKey: undefined })).not.toThrow();
+  });
+});
+
+describe("groq provider", () => {
+  it("стримит chat deltas, usage из финального chunk и верные поля body", async () => {
+    let requestUrl = "";
+    let requestBody: Record<string, unknown> | undefined;
+
+    const fetchMock = vi.fn(
+      async (url: string | URL | Request, init?: RequestInit) => {
+        requestUrl = String(url);
+        requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+        return sseResponse(
+          chatSseBody([
+            {
+              id: "chatcmpl_test",
+              object: "chat.completion.chunk",
+              created: 1,
+              model: "openai/gpt-oss-120b",
+              choices: [
+                {
+                  index: 0,
+                  delta: { role: "assistant", content: "Hello" },
+                  finish_reason: null,
+                },
+              ],
+            },
+            {
+              id: "chatcmpl_test",
+              object: "chat.completion.chunk",
+              created: 1,
+              model: "openai/gpt-oss-120b",
+              choices: [
+                {
+                  index: 0,
+                  delta: { content: " groq" },
+                  finish_reason: null,
+                },
+              ],
+            },
+            {
+              id: "chatcmpl_test",
+              object: "chat.completion.chunk",
+              created: 1,
+              model: "openai/gpt-oss-120b",
+              choices: [
+                {
+                  index: 0,
+                  delta: {},
+                  finish_reason: "stop",
+                },
+              ],
+            },
+            {
+              id: "chatcmpl_test",
+              object: "chat.completion.chunk",
+              created: 1,
+              model: "openai/gpt-oss-120b",
+              choices: [],
+              usage: {
+                prompt_tokens: 11,
+                completion_tokens: 2,
+                total_tokens: 13,
+              },
+            },
+          ]),
+        );
+      },
+    );
+
+    const provider = groq({
+      apiKey: "test-groq-key",
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+
+    const chunks: string[] = [];
+    const usage = await provider.stream(
+      {
+        system: "Be brief.",
+        messages: [{ role: "user", content: "Say hi" }],
+        maxTokens: 64,
+        temperature: 0.3,
+        effort: "low",
+      },
+      (text) => chunks.push(text),
+    );
+
+    expect(chunks).toEqual(["Hello", " groq"]);
+    expect(usage).toEqual({ inputTokens: 11, outputTokens: 2 });
+    expect(requestUrl).toContain("api.groq.com/openai/v1/chat/completions");
+    expect(requestBody).toMatchObject({
+      model: "openai/gpt-oss-120b",
+      stream: true,
+      stream_options: { include_usage: true },
+      max_completion_tokens: 64,
+      temperature: 0.3,
+      reasoning_effort: "low",
+      messages: [
+        { role: "system", content: "Be brief." },
+        { role: "user", content: "Say hi" },
+      ],
+    });
+    expect(provider.models[0]?.id).toBe("openai/gpt-oss-120b");
+  });
+
+  it("не создаёт SDK до первого stream", () => {
+    expect(() => groq({ apiKey: undefined })).not.toThrow();
   });
 });

@@ -206,3 +206,78 @@ export function openai(options: ProviderOptions = {}): Provider {
 
   return provider;
 }
+
+const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
+
+/**
+ * Groq через OpenAI-compatible Chat Completions.
+ * Responses API у Groq ограничен — стримим chat.completions.
+ */
+export function groq(options: ProviderOptions = {}): Provider {
+  let client: OpenAI | undefined;
+
+  const getClient = (): OpenAI => {
+    if (!client) {
+      const apiKey = options.apiKey ?? config.groqApiKey;
+      client = new OpenAI({
+        apiKey,
+        baseURL: GROQ_BASE_URL,
+        maxRetries: 3,
+        ...(options.fetch ? { fetch: options.fetch } : {}),
+      });
+    }
+    return client;
+  };
+
+  const provider: Provider = {
+    name: "groq",
+    models: [
+      {
+        id: "openai/gpt-oss-120b",
+        inputPerMillion: 0.15,
+        outputPerMillion: 0.6,
+      },
+    ],
+    async stream(completion, onText) {
+      const model = resolveModelId(provider, completion.model);
+      const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+      if (completion.system) {
+        messages.push({ role: "system", content: completion.system });
+      }
+      for (const message of completion.messages) {
+        messages.push({ role: message.role, content: message.content });
+      }
+
+      const stream = await getClient().chat.completions.create({
+        model,
+        messages,
+        stream: true,
+        stream_options: { include_usage: true },
+        max_completion_tokens: completion.maxTokens ?? 1024,
+        ...(completion.temperature !== undefined
+          ? { temperature: completion.temperature }
+          : {}),
+        // gpt-oss: low | medium | high
+        ...(completion.effort ? { reasoning_effort: completion.effort } : {}),
+      });
+
+      let inputTokens = 0;
+      let outputTokens = 0;
+
+      for await (const chunk of stream) {
+        const text = chunk.choices[0]?.delta?.content;
+        if (text) {
+          onText(text);
+        }
+        if (chunk.usage) {
+          inputTokens = chunk.usage.prompt_tokens;
+          outputTokens = chunk.usage.completion_tokens;
+        }
+      }
+
+      return { inputTokens, outputTokens };
+    },
+  };
+
+  return provider;
+}
