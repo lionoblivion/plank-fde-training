@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { io } from "next/cache";
 import { z } from "zod";
 
@@ -105,19 +106,22 @@ export async function listRequests(
 /**
  * Заявка по id или undefined, если нет.
  * Не-UUID сразу not found — до SQL.
+ * cache() — один запрос на request при metadata + page.
  */
-export async function getRequest(id: string): Promise<WorkRequest | undefined> {
-  await io();
-  if (!isRequestId(id)) {
-    return undefined;
-  }
-  const rows = await query(
-    `select ${REQUEST_SELECT} from requests where id = $1`,
-    [id],
-  );
-  const row = rows[0];
-  return row ? parseRow(row) : undefined;
-}
+export const getRequest = cache(
+  async (id: string): Promise<WorkRequest | undefined> => {
+    await io();
+    if (!isRequestId(id)) {
+      return undefined;
+    }
+    const rows = await query(
+      `select ${REQUEST_SELECT} from requests where id = $1`,
+      [id],
+    );
+    const row = rows[0];
+    return row ? parseRow(row) : undefined;
+  },
+);
 
 /**
  * Меняет статус заявки. Статус проверяется по enum схемы до записи.

@@ -17,4 +17,7 @@ export const schemaStatements = [
   // стабильный порядок «новые сверху» при одинаковом created_at
   `create sequence if not exists requests_seq`,
   `alter table requests add column if not exists seq bigint not null default nextval('requests_seq')`,
+  `create index if not exists requests_created_at_seq_idx on requests (created_at desc, seq desc)`,
+  `create index if not exists requests_team_idx on requests (team)`,
+  `create index if not exists requests_status_idx on requests (status)`,
 ] as const;

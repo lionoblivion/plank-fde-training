@@ -1,4 +1,3 @@
-import { PGlite } from "@electric-sql/pglite";
 import postgres from "postgres";
 
 import { config } from "@/lib/config";
@@ -23,7 +22,7 @@ async function applySchema(run: QueryFn): Promise<void> {
 }
 
 async function createPostgresQuery(url: string): Promise<QueryFn> {
-  const sql = postgres(url, { max: 1 });
+  const sql = postgres(url, { max: 10 });
   const run: QueryFn = async (text, params = []) => {
     const rows = await sql.unsafe(text, params as never[]);
     return rows as unknown as Record<string, unknown>[];
@@ -35,6 +34,8 @@ async function createPostgresQuery(url: string): Promise<QueryFn> {
 async function createPgliteQuery(
   dataDir: string | undefined,
 ): Promise<QueryFn> {
+  // Динамический импорт: WASM PGlite не тянется в postgres://-бандлы
+  const { PGlite } = await import("@electric-sql/pglite");
   const db = dataDir ? await PGlite.create(dataDir) : await PGlite.create();
   const run: QueryFn = async (text, params = []) => {
     const result = await db.query(text, params);
@@ -55,13 +56,22 @@ async function getQuery(): Promise<QueryFn> {
   if (!globalWithDb[DB_KEY]) {
     const url = config.databaseUrl;
     globalWithDb[DB_KEY] = (async () => {
-      if (url?.startsWith("postgres://") || url?.startsWith("postgresql://")) {
-        return createPostgresQuery(url);
+      try {
+        if (
+          url?.startsWith("postgres://") ||
+          url?.startsWith("postgresql://")
+        ) {
+          return await createPostgresQuery(url);
+        }
+        if (url === "memory://" || url?.startsWith("memory://")) {
+          return await createPgliteQuery(undefined);
+        }
+        return await createPgliteQuery(".data/pg");
+      } catch (error) {
+        // Сбой первого коннекта не кэшируем навсегда — health сможет восстановиться
+        delete globalWithDb[DB_KEY];
+        throw error;
       }
-      if (url === "memory://" || url?.startsWith("memory://")) {
-        return createPgliteQuery(undefined);
-      }
-      return createPgliteQuery(".data/pg");
     })();
   }
   return globalWithDb[DB_KEY];

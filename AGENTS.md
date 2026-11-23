@@ -1,4 +1,4 @@
-# WorkBot
+﻿# WorkBot
 
 WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwind CSS и shadcn/ui.
 Пакетный менеджер: pnpm. Деплой: Vercel (preview на каждую ветку, production на main).
@@ -8,7 +8,7 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
 - `pnpm dev` — локальный сервер на http://localhost:3000
 - `pnpm check` — ESLint, Prettier, tsc и next build. Запускайте перед каждым коммитом.
 - `pnpm exec prettier --write .` — автоформатирование
-- `docker compose up -d` — локальный Postgres; `DATABASE_URL=postgres://postgres@localhost:5432/workbot` в `.env.local`
+- `docker compose up -d` — локальный Postgres; `DATABASE_URL=postgres://postgres@localhost:5433/workbot` в `.env.local`
 
 ## Структура
 
