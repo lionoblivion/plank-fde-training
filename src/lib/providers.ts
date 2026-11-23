@@ -1,9 +1,9 @@
-import "server-only";
-
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 
 import { config } from "@/lib/config";
+
+// Только сервер / CLI (`pnpm chat`). Не импортировать из `"use client"`.
 
 /** Сообщение диалога для обоих провайдеров. */
 export type CompletionMessage = {
