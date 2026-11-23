@@ -10,6 +10,7 @@ const cookiesMock = vi.fn(async () => ({
 
 vi.mock("next/server", () => ({
   after: (fn: () => void | Promise<void>) => afterMock(fn),
+  connection: async () => undefined,
 }));
 
 vi.mock("next/headers", () => ({

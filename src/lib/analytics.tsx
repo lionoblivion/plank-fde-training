@@ -1,5 +1,5 @@
 import { Suspense, type ReactNode } from "react";
-import { after } from "next/server";
+import { after, connection } from "next/server";
 import { cookies } from "next/headers";
 
 import { config } from "@/lib/config";
@@ -23,6 +23,8 @@ export async function track(
   }
 
   try {
+    // Request-time: иначе Cache Components ругается на Date/cookies при пререндере
+    await connection();
     const cookieStore = await cookies();
     const distinctId = cookieStore.get("visitor")?.value ?? crypto.randomUUID();
 
@@ -34,16 +36,16 @@ export async function track(
       }
     }
 
-    const body = {
-      api_key: apiKey,
-      distinct_id: distinctId,
-      event,
-      properties: cleanProps,
-      timestamp: new Date().toISOString(),
-    };
-
     after(async () => {
       try {
+        // timestamp только внутри after — new Date() на пререндере запрещён
+        const body = {
+          api_key: apiKey,
+          distinct_id: distinctId,
+          event,
+          properties: cleanProps,
+          timestamp: new Date().toISOString(),
+        };
         await fetch(`${config.posthogHost}/i/v0/e/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
