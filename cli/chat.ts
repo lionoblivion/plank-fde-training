@@ -80,8 +80,17 @@ async function main(): Promise<void> {
     values["max-tokens"] !== undefined
       ? Number(values["max-tokens"])
       : undefined;
-  const effort = values.effort as
-    "low" | "medium" | "high" | "xhigh" | "max" | undefined;
+  const validEfforts = ["low", "medium", "high", "xhigh", "max"] as const;
+  type Effort = (typeof validEfforts)[number];
+  let effort: Effort | undefined;
+  if (values.effort !== undefined) {
+    if (!(validEfforts as readonly string[]).includes(values.effort)) {
+      throw new Error(
+        `Invalid --effort "${values.effort}". Use: ${validEfforts.join(", ")}`,
+      );
+    }
+    effort = values.effort as Effort;
+  }
 
   const session = new Session(provider, model, defaultSystemPrompt, {
     temperature: Number.isFinite(temperature) ? temperature : undefined,
