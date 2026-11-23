@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Cursor hooks — Node CJS-скрипты со stdin/stdout JSON
     ".cursor/hooks/**",
+    // Публичный сайт — отдельное Next.js-приложение со своим ESLint
+    "site/**",
   ]),
 ]);
 
