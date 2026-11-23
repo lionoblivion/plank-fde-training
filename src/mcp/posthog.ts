@@ -66,12 +66,24 @@ export function stripPostHogProps(
  * Capture host (eu.i.posthog.com) → API host (eu.posthog.com).
  * Или явный POSTHOG_API_HOST.
  */
+function assertHttpsHost(raw: string, fallback: string): string {
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "https:") {
+      return fallback;
+    }
+    return raw.replace(/\/$/, "");
+  } catch {
+    return fallback;
+  }
+}
+
 export function resolvePostHogApiHost(
   captureHost?: string,
   apiHost?: string,
 ): string {
   if (apiHost) {
-    return apiHost.replace(/\/$/, "");
+    return assertHttpsHost(apiHost, "https://us.posthog.com");
   }
   const raw = (captureHost ?? "https://us.i.posthog.com").replace(/\/$/, "");
   if (raw.includes("eu.i.posthog.com") || raw.includes("eu.posthog.com")) {
@@ -82,7 +94,11 @@ export function resolvePostHogApiHost(
   }
   try {
     const url = new URL(raw);
-    return `${url.protocol}//${url.host.replace(/^([a-z0-9-]+)\.i\./, "$1.")}`;
+    if (url.protocol !== "https:") {
+      return "https://us.posthog.com";
+    }
+    const host = url.host.replace(/^([a-z0-9-]+)\.i\./, "$1.");
+    return `https://${host}`;
   } catch {
     return "https://us.posthog.com";
   }
@@ -243,7 +259,9 @@ export function posthogServer(api: PostHogApi): McpServer {
           limit: 1,
         });
         if (results.length > 0) {
-          const ts = String(results[0]?.timestamp ?? "unknown time");
+          const rawTs = String(results[0]?.timestamp ?? "");
+          // Только ISO-подобная метка — без сырого текста из API в ответ модели
+          const ts = /^\d{4}-\d{2}-\d{2}T/.test(rawTs) ? rawTs : "unknown time";
           return toolText(
             `Yes: "${event}" was captured in the last ${minutes} minutes (latest at ${ts}).`,
           );

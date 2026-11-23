@@ -1,6 +1,8 @@
 /**
  * Stdio-entry MCP PostHog: personal key + project id из .env.local.
  * node --env-file-if-exists=.env.local --import tsx mcp/posthog.ts
+ *
+ * process.env здесь намеренно: отдельный Node-процесс вне Next, без бандла config.
  */
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
@@ -22,7 +24,7 @@ async function main(): Promise<void> {
   }
 
   const apiHost = resolvePostHogApiHost(
-    process.env.POSTHOG_HOST ?? process.env.POSTHOG_API_HOST,
+    process.env.POSTHOG_HOST,
     process.env.POSTHOG_API_HOST,
   );
 

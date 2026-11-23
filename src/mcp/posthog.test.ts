@@ -31,6 +31,9 @@ describe("stripPostHogProps / resolvePostHogApiHost", () => {
     expect(resolvePostHogApiHost(undefined, "https://eu.posthog.com/")).toBe(
       "https://eu.posthog.com",
     );
+    expect(resolvePostHogApiHost(undefined, "http://evil.local")).toBe(
+      "https://us.posthog.com",
+    );
   });
 });
 
