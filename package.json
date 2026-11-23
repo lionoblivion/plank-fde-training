@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:live": "vitest run --config vitest.live.config.mts",
     "chat": "node --env-file-if-exists=.env.local --import tsx cli/chat.ts",
     "check": "eslint . && prettier --check . && next typegen && tsc --noEmit && pnpm test && next build && pnpm --filter workbot-site check"
   },
