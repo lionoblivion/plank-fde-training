@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const afterMock = vi.fn((fn: () => void | Promise<void>) => {
-  void fn();
+const afterMock = vi.fn(async (fn: () => void | Promise<void>) => {
+  await fn();
 });
 const cookiesMock = vi.fn(async () => ({
   get: (name: string) =>
@@ -56,6 +56,7 @@ describe("track", () => {
     });
 
     expect(afterMock).toHaveBeenCalledTimes(1);
+    await afterMock.mock.results[0]?.value;
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     expect(fetchMock).toHaveBeenCalledWith(

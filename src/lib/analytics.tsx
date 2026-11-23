@@ -22,36 +22,40 @@ export async function track(
     return;
   }
 
-  const cookieStore = await cookies();
-  const distinctId = cookieStore.get("visitor")?.value ?? crypto.randomUUID();
+  try {
+    const cookieStore = await cookies();
+    const distinctId = cookieStore.get("visitor")?.value ?? crypto.randomUUID();
 
-  // Убираем undefined — в JSON не тащим лишнее
-  const cleanProps: Record<string, string | number | boolean | null> = {};
-  for (const [key, value] of Object.entries(properties)) {
-    if (value !== undefined) {
-      cleanProps[key] = value;
+    // Убираем undefined — в JSON не тащим лишнее
+    const cleanProps: Record<string, string | number | boolean | null> = {};
+    for (const [key, value] of Object.entries(properties)) {
+      if (value !== undefined) {
+        cleanProps[key] = value;
+      }
     }
+
+    const body = {
+      api_key: apiKey,
+      distinct_id: distinctId,
+      event,
+      properties: cleanProps,
+      timestamp: new Date().toISOString(),
+    };
+
+    after(async () => {
+      try {
+        await fetch(`${config.posthogHost}/i/v0/e/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      } catch {
+        // Аналитика не должна ломать ответ
+      }
+    });
+  } catch {
+    // cookies()/after вне request-контекста — не рвём Server Action
   }
-
-  const body = {
-    api_key: apiKey,
-    distinct_id: distinctId,
-    event,
-    properties: cleanProps,
-    timestamp: new Date().toISOString(),
-  };
-
-  after(async () => {
-    try {
-      await fetch(`${config.posthogHost}/i/v0/e/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-    } catch {
-      // Аналитика не должна ломать ответ
-    }
-  });
 }
 
 async function TrackEffect({

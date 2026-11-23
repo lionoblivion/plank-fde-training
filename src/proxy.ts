@@ -14,6 +14,8 @@ export function proxy(request: NextRequest) {
     response.cookies.set(VISITOR_COOKIE, crypto.randomUUID(), {
       httpOnly: true,
       sameSite: "lax",
+      // На localhost (http) secure блокирует Set-Cookie
+      secure: request.nextUrl.protocol === "https:",
       path: "/",
       // Год: стабильный distinct_id между визитами
       maxAge: 60 * 60 * 24 * 365,

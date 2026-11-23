@@ -13,6 +13,17 @@ export const config = {
    * Alias POST_HOG_API — локальное имя из setup.
    */
   posthogKey: process.env.POSTHOG_KEY ?? process.env.POST_HOG_API,
-  /** Хост capture API, без trailing slash */
-  posthogHost: process.env.POSTHOG_HOST ?? "https://us.i.posthog.com",
+  /** Хост capture API, без trailing slash (только https) */
+  posthogHost: (() => {
+    const raw = process.env.POSTHOG_HOST ?? "https://us.i.posthog.com";
+    try {
+      const url = new URL(raw);
+      if (url.protocol !== "https:") {
+        return "https://us.i.posthog.com";
+      }
+      return raw.replace(/\/$/, "");
+    } catch {
+      return "https://us.i.posthog.com";
+    }
+  })(),
 };
