@@ -17,7 +17,7 @@ import {
   priorityLabels,
   teamLabels,
   teams,
-} from "@/lib/request-options";
+} from "@/lib/request-model";
 
 const initialState: CreateRequestState = {};
 

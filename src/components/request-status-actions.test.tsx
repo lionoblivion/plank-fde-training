@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { RequestStatusActions } from "./request-status-actions";
-import type { WorkRequest } from "@/lib/requests";
+import type { WorkRequest } from "@/lib/request-model";
 
 function makeRequest(
   overrides: Partial<WorkRequest> & Pick<WorkRequest, "status">,

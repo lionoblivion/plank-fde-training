@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { requestSchema, statuses } from "@/lib/requests";
+import { requestSchema, statuses } from "@/lib/request-model";
 
 /** Тело POST — та же схема заявки, что у формы. */
 export const postRequestSchema = requestSchema;

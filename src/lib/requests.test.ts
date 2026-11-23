@@ -14,13 +14,13 @@ import {
 } from "./requests";
 
 describe("requests", () => {
-  beforeEach(() => {
-    resetRequestStore();
+  beforeEach(async () => {
+    await resetRequestStore();
   });
 
   describe("trimming", () => {
-    it("удаляет пробелы по краям title и details", () => {
-      const request = createRequest({
+    it("удаляет пробелы по краям title и details", async () => {
+      const request = await createRequest({
         title: "  Нужен доступ  ",
         details: "  Описание заявки  ",
         team: "operations",
@@ -33,8 +33,8 @@ describe("requests", () => {
   });
 
   describe("defaults", () => {
-    it("ставит priority=medium, status=open и пустой details", () => {
-      const request = createRequest({
+    it("ставит priority=medium, status=open и пустой details", async () => {
+      const request = await createRequest({
         title: "Заявка без опций",
         team: "finance",
       });
@@ -50,42 +50,42 @@ describe("requests", () => {
   });
 
   describe("rejection", () => {
-    it("отклоняет пустой title после trim", () => {
-      expect(() =>
+    it("отклоняет пустой title после trim", async () => {
+      await expect(
         createRequest({
           title: "   ",
           team: "support",
         }),
-      ).toThrow(ZodError);
+      ).rejects.toThrow(ZodError);
     });
 
-    it("отклоняет неизвестный team", () => {
-      expect(() =>
+    it("отклоняет неизвестный team", async () => {
+      await expect(
         createRequest({
           title: "Заявка",
           team: "legal",
         }),
-      ).toThrow(ZodError);
+      ).rejects.toThrow(ZodError);
     });
 
-    it("отклоняет неизвестный priority", () => {
-      expect(() =>
+    it("отклоняет неизвестный priority", async () => {
+      await expect(
         createRequest({
           title: "Заявка",
           team: "operations",
           priority: "urgent",
         }),
-      ).toThrow(ZodError);
+      ).rejects.toThrow(ZodError);
     });
   });
 
   describe("store", () => {
     it("сохраняет заявки в общем списке, новые сверху", async () => {
-      createRequest({
+      await createRequest({
         title: "Первая",
         team: "operations",
       });
-      createRequest({
+      await createRequest({
         title: "Вторая",
         team: "support",
         priority: "low",
@@ -99,11 +99,11 @@ describe("requests", () => {
     });
 
     it("фильтрует список по team и status", async () => {
-      createRequest({
+      await createRequest({
         title: "Операции",
         team: "operations",
       });
-      createRequest({
+      await createRequest({
         title: "Поддержка",
         team: "support",
       });
@@ -122,7 +122,7 @@ describe("requests", () => {
     });
 
     it("возвращает заявку по id и undefined для неизвестного", async () => {
-      const created = createRequest({
+      const created = await createRequest({
         title: "Деталь",
         team: "finance",
       });
@@ -131,6 +131,7 @@ describe("requests", () => {
       await expect(
         getRequest("00000000-0000-4000-8000-000000000000"),
       ).resolves.toBeUndefined();
+      await expect(getRequest("not-a-uuid")).resolves.toBeUndefined();
     });
   });
 
@@ -218,31 +219,35 @@ describe("requests", () => {
 
   describe("updateRequestStatus", () => {
     it("меняет статус на допустимый из enum", async () => {
-      const created = createRequest({
+      const created = await createRequest({
         title: "Смена статуса",
         team: "operations",
       });
 
-      const updated = updateRequestStatus(created.id, "in_progress");
+      const updated = await updateRequestStatus(created.id, "in_progress");
       expect(updated.status).toBe("in_progress");
-      expect(updateRequestStatus(created.id, "done").status).toBe("done");
+      expect((await updateRequestStatus(created.id, "done")).status).toBe(
+        "done",
+      );
       expect((await getRequest(created.id))?.status).toBe("done");
     });
 
     it("отклоняет неизвестный статус до записи", async () => {
-      const created = createRequest({
+      const created = await createRequest({
         title: "Плохой статус",
         team: "support",
       });
 
-      expect(() => updateRequestStatus(created.id, "closed")).toThrow(ZodError);
+      await expect(updateRequestStatus(created.id, "closed")).rejects.toThrow(
+        ZodError,
+      );
       expect((await getRequest(created.id))?.status).toBe("open");
     });
 
-    it("бросает ошибку, если заявки нет", () => {
-      expect(() =>
+    it("бросает ошибку, если заявки нет", async () => {
+      await expect(
         updateRequestStatus(crypto.randomUUID(), "done"),
-      ).toThrowError("Заявка не найдена");
+      ).rejects.toThrowError("Заявка не найдена");
     });
   });
 });

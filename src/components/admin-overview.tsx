@@ -23,7 +23,7 @@ import {
   statuses,
   teamLabels,
   type WorkRequest,
-} from "@/lib/requests";
+} from "@/lib/request-model";
 
 const LATEST_LIMIT = 5;
 
