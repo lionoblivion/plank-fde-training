@@ -257,8 +257,15 @@ export function groq(options: ProviderOptions = {}): Provider {
         ...(completion.temperature !== undefined
           ? { temperature: completion.temperature }
           : {}),
-        // gpt-oss: low | medium | high
-        ...(completion.effort ? { reasoning_effort: completion.effort } : {}),
+        // gpt-oss принимает только low|medium|high
+        ...(completion.effort
+          ? {
+              reasoning_effort:
+                completion.effort === "xhigh" || completion.effort === "max"
+                  ? "high"
+                  : completion.effort,
+            }
+          : {}),
       });
 
       let inputTokens = 0;
