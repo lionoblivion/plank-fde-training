@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "check": "eslint . && prettier --check . && next typegen && tsc --noEmit && pnpm test && next build"
+    "check": "eslint . && prettier --check . && next typegen && tsc --noEmit && pnpm test && next build && pnpm --filter workbot-site check"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
