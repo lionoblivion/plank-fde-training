@@ -70,7 +70,9 @@ describe("Session", () => {
     session.use(provider, "fake-unpriced");
     await session.send("b", () => undefined);
     const cost = session.cost();
-    expect(cost.dollars).toBeNull();
+    // Priced-ходы остаются в $; unpriced только именуются
+    expect(cost.dollars).toBe(3);
+    expect(cost.inputTokens).toBe(2_000_000);
     expect(cost.unpricedModels).toContain("fake-unpriced");
   });
 

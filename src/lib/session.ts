@@ -16,9 +16,9 @@ export type SessionTurn = {
 export type SessionCost = {
   inputTokens: number;
   outputTokens: number;
-  /** Сумма $ по опубликованным ценам; null если есть неотценённая модель. */
-  dollars: number | null;
-  /** Id моделей без цены в отчёте. */
+  /** $ только по ходам с опубликованной ценой. */
+  dollars: number;
+  /** Модели без цены — /cost называет их отдельно. */
   unpricedModels: string[];
 };
 
@@ -115,7 +115,7 @@ export class Session {
     return {
       inputTokens,
       outputTokens,
-      dollars: unpriced.size > 0 ? null : dollars,
+      dollars,
       unpricedModels: [...unpriced],
     };
   }
