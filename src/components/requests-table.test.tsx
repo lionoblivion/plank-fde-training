@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { RequestsTable } from "./requests-table";
-import type { WorkRequest } from "@/lib/requests";
+import type { WorkRequest } from "@/lib/request-model";
 
 const sample: WorkRequest = {
   id: "11111111-1111-4111-8111-111111111111",

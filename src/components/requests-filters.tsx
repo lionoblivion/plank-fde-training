@@ -9,7 +9,7 @@ import {
   teamLabels,
   teams,
   type RequestFilters,
-} from "@/lib/requests";
+} from "@/lib/request-model";
 
 type RequestsFiltersProps = {
   filters: RequestFilters;

@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     return Response.json(body, { status: 400 });
   }
 
-  const created = createRequest(parsed.data);
+  const created = await createRequest(parsed.data);
   const body = createRequestResponseSchema.parse({
     request: toResponseRequest(created),
   });

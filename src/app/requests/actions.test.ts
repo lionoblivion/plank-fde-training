@@ -28,8 +28,8 @@ function formDataFrom(entries: Record<string, string>): FormData {
 }
 
 describe("createRequestAction", () => {
-  beforeEach(() => {
-    resetRequestStore();
+  beforeEach(async () => {
+    await resetRequestStore();
   });
 
   it("возвращает ошибки полей при невалидных данных", async () => {
@@ -77,13 +77,13 @@ describe("createRequestAction", () => {
 });
 
 describe("setStatus", () => {
-  beforeEach(() => {
-    resetRequestStore();
+  beforeEach(async () => {
+    await resetRequestStore();
     vi.mocked(refresh).mockClear();
   });
 
   it("обновляет статус и вызывает refresh", async () => {
-    const created = createRequest({
+    const created = await createRequest({
       title: "На смену статуса",
       team: "operations",
     });
@@ -95,7 +95,7 @@ describe("setStatus", () => {
   });
 
   it("не пишет неизвестный статус", async () => {
-    const created = createRequest({
+    const created = await createRequest({
       title: "Защита enum",
       team: "finance",
     });

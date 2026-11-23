@@ -10,8 +10,8 @@ import {
 } from "./types";
 
 describe("GET /api/requests", () => {
-  beforeEach(() => {
-    resetRequestStore();
+  beforeEach(async () => {
+    await resetRequestStore();
   });
 
   it("возвращает пустой список", async () => {
@@ -58,8 +58,8 @@ describe("GET /api/requests", () => {
 });
 
 describe("POST /api/requests", () => {
-  beforeEach(() => {
-    resetRequestStore();
+  beforeEach(async () => {
+    await resetRequestStore();
   });
 
   it("создаёт заявку и отвечает 201", async () => {

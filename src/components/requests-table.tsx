@@ -15,7 +15,7 @@ import {
   statusLabels,
   teamLabels,
   type WorkRequest,
-} from "@/lib/requests";
+} from "@/lib/request-model";
 
 function priorityVariant(
   priority: WorkRequest["priority"],

@@ -13,5 +13,9 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    setupFiles: [path.join(root, "src/lib/db-test-setup.ts")],
+    // Один fork: PGlite / globalThis-соединение не шарится между процессами
+    fileParallelism: false,
+    maxWorkers: 1,
   },
 });

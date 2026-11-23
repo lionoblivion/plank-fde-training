@@ -6,4 +6,6 @@ export const config = {
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "http://localhost:3000"),
+  /** postgres://… | memory:// | пусто → PGlite в .data/pg */
+  databaseUrl: process.env.DATABASE_URL,
 };

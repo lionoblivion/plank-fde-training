@@ -1,6 +1,6 @@
 import { setStatus } from "@/app/requests/actions";
 import { Button } from "@/components/ui/button";
-import { statusLabels, statuses, type WorkRequest } from "@/lib/requests";
+import { statusLabels, statuses, type WorkRequest } from "@/lib/request-model";
 
 type RequestStatusActionsProps = {
   request: WorkRequest;

@@ -1,0 +1,27 @@
+﻿# Локальный Postgres для WorkBot (адаптация Day 5 под Docker / Cursor / Windows).
+# Запуск: docker compose up -d
+# Порт 5433: на Windows 5432 часто занят Hyper-V / зарезервирован.
+# DATABASE_URL=postgres://postgres@localhost:5433/workbot
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: workbot-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: workbot
+      # Только localhost (порт ниже). Для учебного стенда без пароля.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      # Postgres 18+: монтировать /var/lib/postgresql, не .../data
+      - workbot_pg_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d workbot"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  workbot_pg_data:

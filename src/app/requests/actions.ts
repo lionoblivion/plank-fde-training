@@ -58,7 +58,7 @@ export async function createRequestAction(
     };
   }
 
-  createRequest(parsed.data);
+  await createRequest(parsed.data);
   redirect("/requests");
 }
 
@@ -68,6 +68,6 @@ export async function createRequestAction(
  */
 export async function setStatus(id: string, status: string): Promise<void> {
   // updateRequestStatus сверяет status с enum схемы до записи
-  updateRequestStatus(id, status);
+  await updateRequestStatus(id, status);
   refresh();
 }
