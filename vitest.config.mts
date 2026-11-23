@@ -9,6 +9,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.join(root, "src"),
+      // В Node/Vitest нет границы RSC — глушим маркер Next
+      "server-only": path.join(root, "src/lib/server-only-stub.ts"),
     },
   },
   test: {

@@ -13,6 +13,9 @@ export const config = {
    * Alias POST_HOG_API — локальное имя из setup.
    */
   posthogKey: process.env.POSTHOG_KEY ?? process.env.POST_HOG_API,
+  /** Ключи LLM — только сервер (см. providers.ts) */
+  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+  openaiApiKey: process.env.OPENAI_API_KEY,
   /** Хост capture API, без trailing slash (только https) */
   posthogHost: (() => {
     const raw = process.env.POSTHOG_HOST ?? "https://us.i.posthog.com";
