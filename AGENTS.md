@@ -33,6 +33,7 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
    Коммит: `WB-<N>: <название задачи из Linear>`; подробности — в body. Список: https://linear.app/lev789/team/WB/all
 9. При любом изменении пайплайна (скрипты `check`/`test`, GitHub Actions, Vercel, Skills, Subagents, Hooks, процесс PR)
    обновляйте `../doc-plank-fde-training/пайплайн.md`. Если затронуты Skills / Subagents / Hook — синхронизируйте и раздел ниже.
+10. Delivery начинается с **этапа 0 — Ресурсы** (Linear MCP, `gh`, Docker/БД, env): если ресурс не подключён — стоп, починить, затем продолжать. См. `пайплайн.md`.
 
 ## Инструменты Claude Code
 

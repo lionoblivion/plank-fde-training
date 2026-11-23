@@ -29,7 +29,7 @@ alwaysApply: true
 
 1. **Risk Assessment** (этап 2.1) — Level, Reason, Review mode, Required reviewers/tests.
 2. **Implementation Plan** (этап 2.2) — файлы, тесты↔AC, Skills, риски. Без отдельного агента.
-3. **Цикл** — все этапы 1…14 и 2.1/2.2 со статусами.
+3. **Цикл** — этапы **0…14** и 2.1/2.2 со статусами (этап 0 — Ресурсы).
 4. **Agents** — при любом вызове Skill/Subagent укажи в строке этапа, например:
    - `· Agents: bug-hunter`
    - `· Agents: bug-hunter, security-reviewer`
@@ -38,7 +38,9 @@ alwaysApply: true
 
 ## Порядок критичных шагов
 
-Exploring → Risk Assessment → Implementation Plan → ветка → код → Self-Review → `pnpm check` → … → Review Policy по уровню риска.
+**0. Ресурсы** (всё нужное подключено; иначе **стоп**, починить, продолжить) → Задача → Exploring → Risk Assessment → Implementation Plan → ветка → код → Self-Review → `pnpm check` → … → Review Policy по уровню риска.
+
+На этапе 0 проверить по задаче: Git/`gh`, Linear MCP (тикет WB), Docker/БД/`DATABASE_URL`, `.env.local`, pnpm. Не выдумывать AC и id, если Linear недоступен — сначала подключить.
 
 ## Usage
 
