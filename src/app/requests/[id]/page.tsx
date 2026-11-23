@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { track } from "@/lib/analytics";
 import { getRequest } from "@/lib/requests";
 
 type RequestDetailPageProps = {
@@ -45,6 +46,11 @@ async function RequestDetailContent({
   if (!request) {
     notFound();
   }
+
+  await track("request_viewed", {
+    requestId: request.id,
+    team: request.team,
+  });
 
   return <RequestDetail request={request} />;
 }

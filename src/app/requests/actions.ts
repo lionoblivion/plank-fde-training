@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { track } from "@/lib/analytics";
 import {
   createRequest,
   requestSchema,
@@ -58,7 +59,11 @@ export async function createRequestAction(
     };
   }
 
-  await createRequest(parsed.data);
+  const created = await createRequest(parsed.data);
+  await track("request_submitted", {
+    requestId: created.id,
+    team: created.team,
+  });
   redirect("/requests");
 }
 
@@ -68,6 +73,11 @@ export async function createRequestAction(
  */
 export async function setStatus(id: string, status: string): Promise<void> {
   // updateRequestStatus сверяет status с enum схемы до записи
-  await updateRequestStatus(id, status);
+  const updated = await updateRequestStatus(id, status);
+  await track("request_status_changed", {
+    requestId: updated.id,
+    team: updated.team,
+    status: updated.status,
+  });
   refresh();
 }

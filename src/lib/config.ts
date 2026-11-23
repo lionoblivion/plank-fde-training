@@ -8,4 +8,22 @@ export const config = {
       : "http://localhost:3000"),
   /** postgres://… | memory:// | пусто → PGlite в .data/pg */
   databaseUrl: process.env.DATABASE_URL,
+  /**
+   * Project API key PostHog (capture). Курс: POSTHOG_KEY.
+   * Alias POST_HOG_API — локальное имя из setup.
+   */
+  posthogKey: process.env.POSTHOG_KEY ?? process.env.POST_HOG_API,
+  /** Хост capture API, без trailing slash (только https) */
+  posthogHost: (() => {
+    const raw = process.env.POSTHOG_HOST ?? "https://us.i.posthog.com";
+    try {
+      const url = new URL(raw);
+      if (url.protocol !== "https:") {
+        return "https://us.i.posthog.com";
+      }
+      return raw.replace(/\/$/, "");
+    } catch {
+      return "https://us.i.posthog.com";
+    }
+  })(),
 };

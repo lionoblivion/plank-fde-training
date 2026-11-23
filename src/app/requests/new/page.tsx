@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Track } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Новая заявка",
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 export default function NewRequestPage() {
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-16">
+      <Track event="request_form_viewed" />
       <Card>
         <CardHeader>
           <CardTitle>Новая заявка</CardTitle>
