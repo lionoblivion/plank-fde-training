@@ -14,6 +14,8 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: [path.join(root, "src/lib/db-test-setup.ts")],
+    // Live-suite — отдельно: pnpm test:live
+    exclude: ["**/node_modules/**", "**/dist/**", "**/*.live.test.ts"],
     // Один fork: PGlite / globalThis-соединение не шарится между процессами
     fileParallelism: false,
     maxWorkers: 1,

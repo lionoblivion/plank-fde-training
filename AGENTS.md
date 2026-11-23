@@ -8,6 +8,7 @@ WorkBot — приложение на Next.js (App Router) с TypeScript, Tailwi
 - `pnpm dev` — локальный сервер на http://localhost:3000
 - `pnpm check` — ESLint, Prettier, tsc и next build. Запускайте перед каждым коммитом.
 - `pnpm chat` — терминальный WorkBot (флаги `--provider`, `--model`; команды `/cost`, `/model`, `/system`). По умолчанию Groq.
+- `pnpm test:live` — live-вызовы к API на маленькой модели (Groq). Запускайте после смены prompt или providers; обычный `pnpm test` сеть не трогает.
 - `pnpm exec prettier --write .` — автоформатирование
 - `docker compose up -d` — локальный Postgres; `DATABASE_URL=postgres://postgres@localhost:5433/workbot` в `.env.local`
 - PostHog воронка: `POSTHOG_KEY` (или alias `POST_HOG_API`) в `.env.local`; cookie `visitor` ставит `src/proxy.ts`
