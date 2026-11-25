@@ -19,6 +19,12 @@ export const config = {
   groqApiKey: process.env.GROQ_API_KEY,
   /** Tavily Search — опционально; без ключа web_search не регистрируется */
   tavilyApiKey: process.env.TAVILY_API_KEY,
+  /**
+   * Веб-чат (/api/chat): провайдер и override модели.
+   * По умолчанию groq — как `pnpm chat`.
+   */
+  chatProvider: process.env.CHAT_PROVIDER,
+  chatModel: process.env.CHAT_MODEL,
   /** Хост capture API, без trailing slash (только https) */
   posthogHost: (() => {
     const raw = process.env.POSTHOG_HOST ?? "https://us.i.posthog.com";
