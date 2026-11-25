@@ -15,6 +15,9 @@ import "@/lib/tools";
 
 import { chatErrorResponseSchema, chatRequestSchema } from "./types";
 
+/** Tool loop на большой модели может идти дольше дефолтного лимита Vercel. */
+export const maxDuration = 60;
+
 function jsonError(message: string, status = 400): Response {
   const body = chatErrorResponseSchema.parse({ error: message });
   return Response.json(body, { status });
