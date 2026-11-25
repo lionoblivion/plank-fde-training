@@ -20,4 +20,11 @@ export const schemaStatements = [
   `create index if not exists requests_created_at_seq_idx on requests (created_at desc, seq desc)`,
   `create index if not exists requests_team_idx on requests (team)`,
   `create index if not exists requests_status_idx on requests (status)`,
+  // Заметки агента / инструментов Day 7
+  `create table if not exists notes (
+    id uuid primary key default gen_random_uuid(),
+    body text not null,
+    created_at timestamptz not null default clock_timestamp()
+  )`,
+  `create index if not exists notes_created_at_idx on notes (created_at desc)`,
 ] as const;

@@ -18,10 +18,11 @@ function fakeProvider(
       },
       { id: "fake-unpriced" },
     ],
-    async stream(_completion, onText) {
+    async stream(_completion, events) {
       if (fail) {
         throw new Error("boom");
       }
+      const onText = typeof events === "function" ? events : events.text;
       onText(reply);
       return usage;
     },
@@ -87,9 +88,10 @@ describe("Session", () => {
   });
 
   it("передаёт system и историю в stream", async () => {
-    const stream = vi.fn(async (completion, onText) => {
+    const stream = vi.fn(async (completion, events) => {
       expect(completion.system).toBe("sys");
       expect(completion.messages).toEqual([{ role: "user", content: "Hi" }]);
+      const onText = typeof events === "function" ? events : events.text;
       onText("yo");
       return { inputTokens: 1, outputTokens: 1 };
     });

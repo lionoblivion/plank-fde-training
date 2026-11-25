@@ -64,10 +64,11 @@ describe("policies", () => {
   });
 
   describe("content files", () => {
-    it("listPolicies возвращает ровно 8 политик", async () => {
+    it("listPolicies возвращает ровно 9 политик", async () => {
       const policies = await listPolicies();
-      expect(policies).toHaveLength(8);
-      expect(new Set(policies.map((p) => p.slug)).size).toBe(8);
+      expect(policies).toHaveLength(9);
+      expect(new Set(policies.map((p) => p.slug)).size).toBe(9);
+      expect(policies.some((p) => p.slug === "refunds")).toBe(true);
     });
 
     it("читает политику expenses с телом Markdown", async () => {

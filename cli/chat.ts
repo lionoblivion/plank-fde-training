@@ -3,8 +3,11 @@ import { stdin as input, stdout as output, stderr } from "node:process";
 import { parseArgs } from "node:util";
 
 import { anthropic, groq, openai, type Provider } from "@/lib/providers";
+import { research } from "@/lib/research";
 import { Session } from "@/lib/session";
 import { systemPrompt as defaultSystemPrompt } from "@/lib/system-prompt";
+// Регистрация calculator / read_url / save_note / web_search
+import "@/lib/tools";
 
 type Factory = () => Provider;
 
@@ -44,6 +47,7 @@ function printHelp(): void {
   /cost                         — токены и $ за сессию
   /model [provider] [model]     — список или смена модели
   /system [text]                — показать или заменить system prompt
+  /research <question>          — цепочка: policies (+ web) → ответ с цитатами
 `);
 }
 
@@ -193,10 +197,51 @@ async function main(): Promise<void> {
         again();
         continue;
       }
+      if (text === "/research" || text.startsWith("/research ")) {
+        const question = text.slice("/research".length).trim();
+        if (!question) {
+          stderr.write("Использование: /research <question>\n");
+          again();
+          continue;
+        }
+        try {
+          const dim = "\x1b[2m";
+          const reset = "\x1b[0m";
+          await research(question, session.provider, {
+            step: (message) => {
+              output.write(`${dim}${message}${reset}\n`);
+            },
+            text: (delta) => output.write(delta),
+            spend: (modelId, usage) => {
+              session.record(modelId, usage);
+            },
+          });
+          output.write("\n");
+        } catch (error) {
+          // research не пишет в session.messages — история чата не меняется
+          const message =
+            error instanceof Error ? error.message : String(error);
+          stderr.write(`Ошибка: ${message}\n`);
+        }
+        again();
+        continue;
+      }
 
       try {
         if (interactive) output.write("workbot> ");
-        await session.send(text, (chunk) => output.write(chunk));
+        await session.send(text, {
+          text: (chunk) => output.write(chunk),
+          tool: (call) => {
+            // Dimmed строка вызова, как в курсе Day 7
+            const dim = "\x1b[2m";
+            const reset = "\x1b[0m";
+            const payload = JSON.stringify(call.input);
+            const mark = call.isError ? "error" : "ok";
+            output.write(
+              `\n${dim}⚙ ${call.name}(${payload}) → ${mark}${reset}\n`,
+            );
+          },
+        });
         output.write("\n");
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
