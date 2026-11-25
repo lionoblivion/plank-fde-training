@@ -2,8 +2,11 @@ import type {
   Completion,
   CompletionMessage,
   Provider,
+  StreamEvents,
   TokenUsage,
 } from "@/lib/providers";
+import type { Tool } from "@/lib/tool-def";
+import { listTools } from "@/lib/tools";
 
 export type SessionTurn = {
   model: string;
@@ -26,6 +29,11 @@ export type SessionOptions = {
   temperature?: number;
   maxTokens?: number;
   effort?: Completion["effort"];
+  /**
+   * Инструменты хода. По умолчанию — реестр listTools().
+   * Передай [] чтобы отключить.
+   */
+  tools?: Tool[];
 };
 
 /**
@@ -42,10 +50,17 @@ export class Session {
     public options: SessionOptions = {},
   ) {}
 
+  private resolveTools(): Tool[] | undefined {
+    if (this.options.tools !== undefined) {
+      return this.options.tools;
+    }
+    return listTools();
+  }
+
   /** Стримит ответ; при ошибке история не меняется. */
   async send(
     text: string,
-    onText: (chunk: string) => void,
+    events: StreamEvents | ((chunk: string) => void),
   ): Promise<TokenUsage> {
     const nextMessages: CompletionMessage[] = [
       ...this.messages,
@@ -53,6 +68,7 @@ export class Session {
     ];
 
     let reply = "";
+    const tools = this.resolveTools();
     const usage = await this.provider.stream(
       {
         model: this.model,
@@ -61,11 +77,22 @@ export class Session {
         maxTokens: this.options.maxTokens,
         temperature: this.options.temperature,
         effort: this.options.effort,
+        ...(tools && tools.length > 0 ? { tools } : {}),
       },
-      (chunk) => {
-        reply += chunk;
-        onText(chunk);
-      },
+      typeof events === "function"
+        ? {
+            text: (chunk) => {
+              reply += chunk;
+              events(chunk);
+            },
+          }
+        : {
+            text: (chunk) => {
+              reply += chunk;
+              events.text(chunk);
+            },
+            tool: events.tool,
+          },
     );
 
     this.messages = [...nextMessages, { role: "assistant", content: reply }];
@@ -87,6 +114,20 @@ export class Session {
 
   setSystem(system: string): void {
     this.system = system;
+  }
+
+  /**
+   * Учёт spend вне send() — например research chain.
+   * Не меняет messages.
+   */
+  record(model: string, usage: TokenUsage): void {
+    const listed = this.provider.models.find((m) => m.id === model);
+    this.turns.push({
+      model,
+      usage,
+      inputPerMillion: listed?.inputPerMillion,
+      outputPerMillion: listed?.outputPerMillion,
+    });
   }
 
   /** Токены и $: каждый ход по цене модели, которая ответила. */
