@@ -32,7 +32,9 @@ function readRaw(): string | null {
 
 function writeRaw(raw: string): boolean {
   try {
-    globalThis.localStorage.setItem(STORAGE_KEY, raw);
+    const storage = globalThis.localStorage;
+    if (!storage) return false;
+    storage.setItem(STORAGE_KEY, raw);
     return true;
   } catch {
     return false;
@@ -108,8 +110,9 @@ export function getConversations(): Conversation[] {
 /** Пишет список в localStorage и уведомляет подписчиков. */
 export function saveConversations(conversations: Conversation[]): void {
   const raw = JSON.stringify(conversations);
-  if (!writeRaw(raw)) return;
-  cachedRaw = raw;
+  const persisted = writeRaw(raw);
+  // При сбое квоты / private mode держим список в памяти до перезагрузки
+  cachedRaw = persisted ? raw : cachedRaw;
   cachedList = conversations;
   notify();
 }
