@@ -1,36 +1,58 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 
 import { Message } from "@/components/message";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  getBrowserChat,
-  persistChatMessages,
-  type WorkBotChat,
-} from "@/lib/chat-session";
+import { getConversations, upsertConversation } from "@/lib/conversations";
 
-const emptySubscribe = () => () => {};
+type ChatProps = {
+  /** Id беседы; снаружи key={id} — remount при смене. */
+  conversationId: string;
+};
 
-function ChatPanel({ chat }: { chat: WorkBotChat }) {
+/** Клиентский чат поверх POST /api/chat для одной беседы. */
+export function Chat({ conversationId }: ChatProps) {
   const [input, setInput] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const stickToBottom = useRef(true);
   const sendingRef = useRef(false);
+  const prevStatus = useRef<string>("ready");
+
+  const initialMessages = useMemo(() => {
+    return (
+      getConversations().find((item) => item.id === conversationId)?.messages ??
+      []
+    );
+  }, [conversationId]);
+
+  const transport = useMemo(
+    () => new DefaultChatTransport({ api: "/api/chat" }),
+    [],
+  );
 
   const { messages, sendMessage, status, stop, error, clearError } = useChat({
-    chat,
+    id: conversationId,
+    messages: initialMessages,
+    transport,
   });
 
   const pending = status === "submitted";
   const streaming = status === "streaming";
 
+  // Сохраняем беседу один раз за ответ — когда status снова ready
   useEffect(() => {
-    persistChatMessages(messages);
-  }, [messages]);
+    const prev = prevStatus.current;
+    prevStatus.current = status;
+    const finished =
+      (prev === "submitted" || prev === "streaming") && status === "ready";
+    if (!finished || messages.length === 0) return;
+    upsertConversation({ id: conversationId, messages });
+  }, [status, messages, conversationId]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -135,24 +157,4 @@ function ChatPanel({ chat }: { chat: WorkBotChat }) {
       </form>
     </div>
   );
-}
-
-/** Клиентский чат поверх POST /api/chat. */
-export function Chat() {
-  // Синглтон только в браузере; на SSR — null (без setState в effect)
-  const chat = useSyncExternalStore(
-    emptySubscribe,
-    getBrowserChat,
-    (): WorkBotChat | null => null,
-  );
-
-  if (!chat) {
-    return (
-      <div className="flex h-[min(70vh,720px)] items-center justify-center rounded-xl border border-border text-sm text-muted-foreground">
-        Загрузка чата…
-      </div>
-    );
-  }
-
-  return <ChatPanel chat={chat} />;
 }
