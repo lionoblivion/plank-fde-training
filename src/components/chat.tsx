@@ -53,14 +53,12 @@ function ChatPanel({ chat }: { chat: WorkBotChat }) {
     sendingRef.current = true;
     clearError();
     setInput("");
-    if (textareaRef.current) textareaRef.current.value = "";
     stickToBottom.current = true;
 
     try {
       await sendMessage({ text });
     } catch {
       setInput(text);
-      if (textareaRef.current) textareaRef.current.value = text;
     } finally {
       sendingRef.current = false;
     }
@@ -115,7 +113,6 @@ function ChatPanel({ chat }: { chat: WorkBotChat }) {
           ref={textareaRef}
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          onInput={(event) => setInput(event.currentTarget.value)}
           onKeyDown={onKeyDown}
           placeholder="Сообщение… Enter — отправить, Shift+Enter — новая строка"
           rows={1}

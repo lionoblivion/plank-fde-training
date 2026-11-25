@@ -12,7 +12,16 @@ function loadMessages(): UIMessage[] {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as UIMessage[]) : [];
+    if (!Array.isArray(parsed)) return [];
+    // Минимальная проверка формы UIMessage
+    const ok = parsed.every(
+      (m) =>
+        m != null &&
+        typeof m === "object" &&
+        typeof (m as { role?: unknown }).role === "string" &&
+        Array.isArray((m as { parts?: unknown }).parts),
+    );
+    return ok ? (parsed as UIMessage[]) : [];
   } catch {
     return [];
   }
