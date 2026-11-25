@@ -18,6 +18,12 @@ export function SiteHeader() {
             Главная
           </Link>
           <Link
+            href="/chat"
+            className="transition-colors hover:text-foreground"
+          >
+            Чат
+          </Link>
+          <Link
             href="/requests"
             className="transition-colors hover:text-foreground"
           >
