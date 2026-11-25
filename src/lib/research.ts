@@ -200,8 +200,7 @@ async function extractFromSource(
   source: NumberedSource,
   provider: Provider,
   largeModel: string,
-  on: ResearchEvents,
-): Promise<string> {
+): Promise<{ n: number; bullets: string; usage: TokenUsage }> {
   const result = await collectCompletion(provider, {
     model: largeModel,
     system:
@@ -223,8 +222,12 @@ Bullet points of relevant facts:`,
     maxTokens: 1024,
     tools: [],
   });
-  on.spend(largeModel, result.usage);
-  return result.text.trim();
+  // spend только после успешного Promise.all — иначе late-complete завышает /cost
+  return {
+    n: source.n,
+    bullets: result.text.trim(),
+    usage: result.usage,
+  };
 }
 
 async function writeAnswer(
@@ -304,19 +307,16 @@ export async function research(
   }
 
   on.step(`Extracting facts from ${sources.length} source(s)…`);
-  const noteEntries = await Promise.all(
-    sources.map(async (source) => {
-      const bullets = await extractFromSource(
-        trimmed,
-        source,
-        provider,
-        large,
-        on,
-      );
-      return [source.n, bullets] as const;
-    }),
+  const extracted = await Promise.all(
+    sources.map((source) =>
+      extractFromSource(trimmed, source, provider, large),
+    ),
   );
-  const notes = new Map(noteEntries);
+  const notes = new Map<number, string>();
+  for (const item of extracted) {
+    on.spend(large, item.usage);
+    notes.set(item.n, item.bullets);
+  }
 
   return writeAnswer(trimmed, sources, notes, provider, large, on);
 }

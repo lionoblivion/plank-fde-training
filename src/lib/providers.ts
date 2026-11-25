@@ -441,7 +441,9 @@ export function groq(options: ProviderOptions = {}): Provider {
 
         const roundToolCalls = [...toolCallsByIndex.entries()]
           .sort(([a], [b]) => a - b)
-          .map(([, call]) => call);
+          .map(([, call]) => call)
+          // Без id нельзя слать role:tool — Groq отклонит весь loop
+          .filter((call) => Boolean(call.id && call.name));
 
         // Только finish_reason tool_calls; length mid-call — стоп без run
         if (finishReason !== "tool_calls" || roundToolCalls.length === 0) {
